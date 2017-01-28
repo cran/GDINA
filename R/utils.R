@@ -32,7 +32,7 @@ inputcheck <- function(dat, Q, model, sequential,higher.order,
   if (!verbose%in%c(0,1,2)) stop("verbose must be 0, 1, or 2.",call. = FALSE)
   if (!is.logical(att.str)) stop("att.str must be TRUE or FALSE.",call. = FALSE)
   if (!all(sapply(mono.constraint,is.logical))) stop("mono.constraint must be TRUE or FALSE.",call. = FALSE)
-  if (!length(mono.constraint)%in%c(1,ncol(dat))) stop("length of mono.constraint must be equal to 1 or the number of items.",call. = FALSE)
+  if (!length(mono.constraint)%in%c(1,nrow(Q))) stop("length of mono.constraint must be equal to 1 or the number of categories.",call. = FALSE)
   if (!is.logical(empirical)) stop("empirical must be TRUE or FALSE.",call. = FALSE)
 
   if (!is.positiveInteger(nstarts)) {nstarts <- 1; warning("nstarts must be a positive integer.")}
@@ -495,24 +495,6 @@ seq_coding <- function(dat,Q){
   return(out)
 }
 
-Rmatrix.att <- function(K){
-  R <- vector("list",K)
-  Lk <- 2^K
-  if (K<=1) return(warning("K must be 2 or more!"))
-  # gives which groups should be set to equal
-  pattK <- alpha(K)
-  pattK_1 <- alpha(K-1)
-  for(a in 1:K){
-    Rk <- matrix(0,Lk/2,Lk)
-    for (l in 1:nrow(pattK_1)){
-      loc <- which(apply(pattK[,-a,drop=FALSE],1,function(x){all(x==pattK_1[l,])}))
-      Rk[l,loc[1]] <- 1
-      Rk[l,loc[2]] <- -1
-    }
-    R[[a]] <- Rk
-  }
-  return(R)
-}
 
 
 bdiag <- function(mlist,fill=0){
@@ -602,7 +584,7 @@ itemprob_se <- function(object,type){
   }else{
     dat <- internalextract(object,"dat")
   }
-vars <-SE(as.matrix(dat), as.matrix(extract(object,"logposterior.i")),
+vars <-SE(as.matrix(dat), as.matrix(internalextract(object,"logposterior.i")),
               as.matrix(pj), eta.loc(Q), m, as.matrix(1 - is.na(dat)), type)
     std.err <- vars$se
     for (j in which((m) %in% c(1, 2))) {
@@ -619,8 +601,7 @@ vars <-SE(as.matrix(dat), as.matrix(extract(object,"logposterior.i")),
 
 scorefunc <- function(object,...){
   if(internalextract(object,"sequential")){
-    Qc <- internalextract(object,"Qc")
-    dat <- seq_coding(internalextract(object,"dat"),Qc)
+    dat <- seq_coding(internalextract(object,"dat"),internalextract(object,"Qc"))
   }else{
     dat <- internalextract(object,"dat")
   }
@@ -629,8 +610,119 @@ scorefunc <- function(object,...){
                    itmpar=internalextract(object,"catprob.matrix"),
                    parloc=eta.loc(internalextract(object,"Q")),
                    model=internalextract(object,"models_numeric"))
-  index = scof$index + 1
+  index = data.frame(scof$index + 1)
   colnames(index) <- c("Column","Cat","Parm")
   list(score = scof$score, index = index)
 }
 
+Rmatrix.vec <- function(K){
+  patt <- alpha(K)
+  eta <- eta.loc(patt[-c(1,nrow(patt)),])
+  Rv <- vector("list",nrow(eta))
+  for (r in 1:nrow(eta)){
+    for(lc in seq_len(max(eta[r,]))){
+      loc <- which(eta[r,]==lc)
+      tmp <- matrix(0,length(loc)-1,2^K)
+      tmp[,loc[1]] <- 1
+      tmp[cbind(seq_len(length(loc)-1),loc[-1])] <- -1
+      Rv[[r]] <- rbind(Rv[[r]],tmp)
+    }
+  }
+  return(Rv)
+}
+
+
+Rmatrix.att <- function(K){
+  R <- vector("list",K)
+  Lk <- 2^K
+  if (K<=1) return(warning("K must be 2 or more!"))
+  # gives which groups should be set to equal
+  pattK <- alpha(K)
+  pattK_1 <- alpha(K-1)
+  for(a in 1:K){
+    Rk <- matrix(0,Lk/2,Lk)
+    for (l in 1:nrow(pattK_1)){
+      loc <- which(apply(pattK[,-a,drop=FALSE],1,function(x){all(x==pattK_1[l,])}))
+      Rk[l,loc[1]] <- 1
+      Rk[l,loc[2]] <- -1
+    }
+    R[[a]] <- Rk
+  }
+  return(R)
+
+
+}
+
+
+valQrate <- function(trueQ,misQ,valQ){
+  Qs <- data.frame(trueQ=c(as.matrix(trueQ)),misQ=c(as.matrix(misQ)),valQ=c(as.matrix(valQ)))
+  CR <- data.frame(true2mis=
+                     apply(matrix(c(0,0,
+                                    1,1,
+                                    0,1,
+                                    1,0),ncol = 2,byrow = TRUE),1,function(x)rowMatch(Qs[,-3],x)$count),
+                   mis2val=apply(matrix(c(0,0,0,
+                                          1,1,1,
+                                          0,1,0,
+                                          1,0,1),ncol = 3,byrow = TRUE),1,function(x)rowMatch(Qs,x)$count),
+                   row.names = c("000/00","111/11","010/01","101/10"))
+  return(CR)
+}
+
+
+#generate misspecified Q-matrix
+#only specified item j is modified
+#misspecification type can be specified
+
+
+# #'@export
+misQrand <- function(Q,sequential = TRUE,num=20,verbose=FALSE){
+  if (sequential)  Qin <- Q[,-c(1:2)] else Qin <- Q
+  check <- TRUE
+  while(check==T){
+    Qvec <- as.vector(as.matrix(Qin))
+    sel <- sample(length(Qvec),num)
+    Qvec[sel] <- ifelse(Qvec[sel],0,1)
+    Qm <- matrix(Qvec,nrow = nrow(Q))
+    if(verbose) print(c(any(rowSums(Qm)==0),any(colSums(Qm)==0),sum(Q!=Qm)!=num))
+    check <- ifelse (any(rowSums(Qm)==0)|any(colSums(Qm)==0)|sum(Qin!=Qm)!=num,TRUE,FALSE)
+  }
+  if(sequential) Qm <- cbind(Q[,c(1,2)],Qm)
+  return(Qm)
+}
+
+
+crossprod.na <- function(x, y, val=0) {
+  crossprod(replace(x, is.na(x), val),
+            replace(y, is.na(y), val)
+  )
+}
+
+SE3 <- function(object,SE.type = 3,...){
+
+  if(internalextract(object,"sequential")){
+    Qc <- internalextract(object,"Qc")
+    dat <- seq_coding(internalextract(object,"dat"),Qc)
+  }else{
+    dat <- internalextract(object,"dat")
+  }
+
+  scof <- scorefun(mX=dat,
+                   mlogPost=internalextract(object,"logposterior.i"),
+                   itmpar=internalextract(object,"catprob.matrix"),
+                   parloc=eta.loc(internalextract(object,"Q")),
+                   model=internalextract(object,"models_numeric"))
+  index = data.frame(scof$index + 1)
+  colnames(index) <- c("Column","Cat","Parm")
+
+  sco <- scof$score*(1-is.na(dat[,index$Cat]))
+  if(SE.type==3){
+    lik <- exp(indlogLik(object))
+    scopp <- (lik-lik[,1])/colSums(c(extract(object,"posterior.prob",digits = 10))*t(lik))
+    sco <- cbind(sco,scopp[,-1])
+  }
+  sco[is.na(sco)] <- 0
+  Info <- crossprod(sco)
+  V <- solve(Info)
+  return(list(var=V,index=index))
+}
