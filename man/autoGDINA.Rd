@@ -14,15 +14,16 @@ autoGDINA(dat, Q, modelselection = TRUE, Qvalid = TRUE,
 }
 \arguments{
 \item{dat}{A required \eqn{N \times J} \code{matrix} or \code{data.frame} consisting of the
-responses of \eqn{N} examinees to \eqn{J} items. Missing values need to be coded as \code{NA}.}
+responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be coded as \code{NA}.}
 
-\item{Q}{A required \eqn{J \times K} item/category and attribute association matrix, wher J represents the number of
-items/categories and K represents the number of attributes. For binary attributes,
-1 denotes attributes are measured by items and 0 means attributes are not
-necessary. For polytomous attributes, non-zero elements indicate which level
-of attributes are needed. Note that for polytomous items, the sequential G-DINA
+\item{Q}{A required \eqn{J \times K} item or category and attribute association matrix, wher \eqn{J} represents the number of
+items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
+entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
+For polytomous attributes, non-zero elements indicate the level
+of attributes that are needed for an individual to answer the item correctly (see Chen, \& de la Torre, 2013).
+Note that for polytomous items, the sequential G-DINA
 model is used and either restricted or unrestricted category-level Q-matrix is needed.
-The first column represents the item number, which must be numeric and match the column in the data.
+In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.
 The second column indicates the category number. See \code{Examples}.}
 
 \item{modelselection}{logical; conducting model selection or not?}
@@ -101,6 +102,7 @@ when \code{modelselectionrule} is \code{simpler}:
 \itemize{
 \item \code{summary}: print summary information
 }}
+
 \note{
 Returned \code{GDINA1.obj}, \code{GDINA2.obj} and \code{CDM.obj} are objects of class \code{GDINA},
  and all S3 methods suitable for \code{GDINA} objects can be applied. See \code{\link{GDINA}} and \code{\link{extract}}.
@@ -141,9 +143,6 @@ out3
 summary(out3)
 }
 }
-\author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
-}
 \references{
 Ma, W., Iaconangelo, C., & de la Torre, J. (2016). Model similarity, model selection and attribute classification.
 \emph{Applied Psychological Measurement, 40}, 200-217.
@@ -151,4 +150,6 @@ Ma, W., Iaconangelo, C., & de la Torre, J. (2016). Model similarity, model selec
 \seealso{
 \code{\link{GDINA}}, \code{\link{modelcomp}}, \code{\link{Qval}}
 }
-
+\author{
+{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+}

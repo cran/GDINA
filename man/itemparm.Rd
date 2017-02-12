@@ -39,4 +39,3 @@ See \code{\link{GDINA}} for examples.
 \author{
 {Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }
-

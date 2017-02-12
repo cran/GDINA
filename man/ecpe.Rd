@@ -51,4 +51,3 @@ Templin, J., & Bradshaw, L. (2014). Hierarchical diagnostic classification model
 Templin, J., & Hoffman, L. (2013). Obtaining diagnostic classification model estimates using Mplus. \emph{Educational Measurement: Issues and Practice, 32}, 37-50.
 }
 \keyword{datasets}
-

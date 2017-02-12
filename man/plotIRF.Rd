@@ -31,4 +31,3 @@ plotIRF(mod1,9, errorbar = TRUE)
 \seealso{
 \code{\link{GDINA}}, \code{\link{autoGDINA}}, \code{\link{dif}}
 }
-

@@ -42,9 +42,6 @@ Ma, Iaconangelo, & de la Torre, 2016; see \code{\link{modelcomp}}),
 and differential item functioning (Hou, de la Torre, & Nandakumar, 2014;
 see \code{\link{dif}}) can also be conducted.
 }
-\author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
-}
 \references{
 Chen, J., & de la Torre, J. (2013). A General Cognitive Diagnosis Model for Expert-Defined Polytomous Attributes.
 \emph{Applied Psychological Measurement, 37}, 419-437.
@@ -88,5 +85,7 @@ Maris, E. (1999). Estimating multiple classification latent class models. \emph{
 \pkg{ACTCD} and \pkg{NPCD}
 for nonparametric CDMs; \pkg{dina} for DINA model in Bayesian framework
 }
+\author{
+{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+}
 \keyword{package}
-

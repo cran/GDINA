@@ -26,4 +26,3 @@ m2 <- bdiagMatrix(list(matrix(1:4, 2), diag(3)),fill = NA)
 \seealso{
 \code{bdiag} in \pkg{Matrix}
 }
-

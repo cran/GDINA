@@ -15,4 +15,3 @@ indlogPost(object, ...)
 Extract individual log posterior
 See \code{\link{GDINA}} for examples.
 }
-

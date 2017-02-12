@@ -33,4 +33,3 @@ check2 <- monocheck(mod2)
 check2
 }
 }
-

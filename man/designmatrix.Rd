@@ -38,4 +38,3 @@ deltaj <- solve(Mj)\%*\%pj
 \references{
 de la Torre, J. (2011). The generalized DINA model framework. \emph{Psychometrika, 76}, 179-199.
 }
-

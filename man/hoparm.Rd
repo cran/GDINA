@@ -25,4 +25,3 @@ Function to extract higher-order parameters when a higher-order model is fitted.
 \author{
 {Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }
-

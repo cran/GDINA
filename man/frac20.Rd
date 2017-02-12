@@ -31,4 +31,3 @@ anova(mod1,mod2)
 Tatsuoka, C. (2002). Data analytic methods for latent partially ordered classification models. \emph{Journal of the Royal Statistical Society, Series C, Applied Statistics, 51}, 337-350.
 }
 \keyword{datasets}
-

@@ -31,4 +31,3 @@ unique_only(vec)
 \seealso{
 \link[base]{unique}
 }
-

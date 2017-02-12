@@ -42,7 +42,7 @@ test_that("checking GDI calculation", {
 
 
   est <- GDINA(dat,Q,catprob.parm = itempar,maxitr = 0,att.prior = w,empirical = FALSE)
-
+  w <- c(est$posterior.prob)
   estp <- t(extract(est,"expectedCorrect.LC")/extract(est,"expectedTotal.LC"))
   pbar <- colSums(estp*w)
   #11

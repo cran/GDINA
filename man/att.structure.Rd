@@ -69,10 +69,9 @@ att.structure(unstru,K)
 ## See Example 4 and 5 in GDINA function
 }
 }
-\author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
-}
 \seealso{
 \code{\link{GDINA}}, \code{\link{autoGDINA}}
 }
-
+\author{
+{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+}

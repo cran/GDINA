@@ -17,4 +17,3 @@ Returned the total number of parameters, the number of item parameters and
 the number of population parameters.
 See \code{\link{GDINA}} for examples.
 }
-

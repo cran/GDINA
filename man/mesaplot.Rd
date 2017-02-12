@@ -49,4 +49,3 @@ mesaplot(out,item=10,type="all",no.qvector=5)
 \seealso{
 \code{\link{Qval}}, \code{\link{autoGDINA}}
 }
-

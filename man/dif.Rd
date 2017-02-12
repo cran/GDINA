@@ -12,20 +12,21 @@ dif(dat, Q, group, method = "wald", difitem = "all", parm = "delta",
 }
 \arguments{
 \item{dat}{A required \eqn{N \times J} \code{matrix} or \code{data.frame} consisting of the
-responses of \eqn{N} examinees to \eqn{J} items. Missing values need to be coded as \code{NA}.}
+responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be coded as \code{NA}.}
 
-\item{Q}{A required \eqn{J \times K} item/category and attribute association matrix, wher J represents the number of
-items/categories and K represents the number of attributes. For binary attributes,
-1 denotes attributes are measured by items and 0 means attributes are not
-necessary. For polytomous attributes, non-zero elements indicate which level
-of attributes are needed. Note that for polytomous items, the sequential G-DINA
+\item{Q}{A required \eqn{J \times K} item or category and attribute association matrix, wher \eqn{J} represents the number of
+items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
+entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
+For polytomous attributes, non-zero elements indicate the level
+of attributes that are needed for an individual to answer the item correctly (see Chen, \& de la Torre, 2013).
+Note that for polytomous items, the sequential G-DINA
 model is used and either restricted or unrestricted category-level Q-matrix is needed.
-The first column represents the item number, which must be numeric and match the column in the data.
+In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.
 The second column indicates the category number. See \code{Examples}.}
 
 \item{group}{a scalar indicating which column in \code{dat} is group indicator or
 a numerical vector indicating the group each individual belongs to. If it is a vector,
-its length must be equal to the number of individuals. More than two groups cannot be handled.}
+its length must be equal to the number of individuals. Only at most two groups can be handled currently.}
 
 \item{method}{DIF detection method; It can be \code{"wald"} for Hou, de la Torre, and Nandakumar's (2014)
 Wald test method, and \code{"LR"} for likelihood ratio test.}
@@ -37,14 +38,14 @@ or \code{"delta"} for item probabilities and delta parameters, respectively.}
 
 \item{digits}{How many decimal places in each number? The default is 4.}
 
-\item{SE.type}{Type of standard error estimation methods for Wald test.}
+\item{SE.type}{Type of standard error estimation methods for the Wald test.}
 
-\item{...}{arguments passed to GDINA function for model calibration}
+\item{...}{Other arguments passed to GDINA function for model calibration}
 
 \item{object}{estimated GDINA object for various S3 methods}
 }
 \value{
-a data frame giving the Wald statistics and associated p-values.
+A data frame giving the Wald statistics and associated p-values.
 }
 \description{
 This function is used to detect differential item functioning based on the models estimated
@@ -54,6 +55,7 @@ in the \code{\link{GDINA}} function using the Wald test (Hou, de la Torre, & Nan
 \itemize{
 \item \code{summary}: print summary information
 }}
+
 \examples{
 \dontrun{
 set.seed(123456)
@@ -80,9 +82,6 @@ plotIRF(dif.out,4)
 dif.out2 <- dif(dat,Q,group=gr,method="LR")
 }
 }
-\author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
-}
 \references{
 Hou, L., de la Torre, J., & Nandakumar, R. (2014). Differential item functioning assessment in cognitive diagnostic modeling: Application of the Wald test to
 investigate DIF in the DINA model. \emph{Journal of Educational Measurement, 51}, 98-125.
@@ -90,4 +89,6 @@ investigate DIF in the DINA model. \emph{Journal of Educational Measurement, 51}
 \seealso{
 \code{\link{GDINA}}
 }
-
+\author{
+{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+}

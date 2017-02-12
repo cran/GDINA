@@ -19,4 +19,3 @@ are given. Based on the Q-matrix and item parameters, responses of 3000 examinee
 were simulated using the random seed of 12345.
 }
 \keyword{datasets}
-

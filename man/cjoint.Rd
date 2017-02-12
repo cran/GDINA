@@ -26,4 +26,3 @@ cjoint(v1 = 2, v2 = c(3,2), v3 = matrix(1:6,3,2),
 \seealso{
 \code{\link[base]{cbind}}
 }
-

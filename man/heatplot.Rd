@@ -17,4 +17,3 @@ Create plots of bivariate heatmap for item fit
 \seealso{
 \code{\link{GDINA}}, \code{\link{itemfit}}
 }
-

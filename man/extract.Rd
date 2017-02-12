@@ -47,14 +47,16 @@ Objects which can be extracted from \code{GDINA} objects include:
   \item{ncat}{number of categories excluding category zero}
   \item{natt}{number of attributes}
   \item{nitr}{number of iterations}
+  \item{ngroup}{number of groups}
   \item{discrim}{GDINA discrimination index}
+  \item{posterior.prob}{posterior weights for each latent class}
+  \item{att.prior}{attribute prior weights for calculating marginalized likelihood in the last iteration}
   \item{time}{time used}
   \item{start.time}{starting time}
   \item{end.time}{end time}
   \item{dat}{item responses analyzed}
   \item{Q}{Q-matrix}
   \item{Qc}{Qc-matrix}
-  \item{posterior.prob}{posterior weights for each latent class}
   \item{prevalence}{prevalence of each attribute}
 \item{itemprob.cov}{variance-covariance matrix of item endorsement probabilities for all items}
 \item{itemprob.covindex}{index of the variance-covariance matrix of item endorsement probabilities for all items}
@@ -70,7 +72,6 @@ Objects which can be extracted from \code{GDINA} objects include:
 \item{SE}{argument SE}
 \item{SE.type}{argument SE.type}
 \item{empirical}{argument empirical}
-\item{att.prior}{argument att.prior}
 \item{att.str}{argument att.str}
 \item{nstarts}{argument nstarts}
 \item{conv.crit}{argument conv.crit}
@@ -89,4 +90,3 @@ Objects which can be extracted from \code{GDINA} objects include:
 \item{call}{function call}
 }
 }
-

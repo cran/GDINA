@@ -34,4 +34,3 @@ attributepattern(ncol(q),poly=TRUE,q)
 \author{
 {Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }
-

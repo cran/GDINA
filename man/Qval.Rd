@@ -50,6 +50,7 @@ Q-matrix validation for the G-DINA model based on de la Torre and Chiu (2016).
 
 \item \code{summary}: print summary information
 }}
+
 \examples{
 \dontrun{
 dat <- sim10GDINA$simdat
@@ -71,9 +72,6 @@ extract(out,what = "sug.Q")
 mesaplot(out,item=10,type="all",no.qvector=5)
 }
 }
-\author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
-}
 \references{
 de la Torre & Chiu. (2016). A General Method of Empirical Q-matrix Validation. \emph{Psychometrika, 81}, 253-273.
 
@@ -82,4 +80,6 @@ de la Torre, J., & Chiu, C.-Y. (2016). A General Method of Empirical Q-matrix Va
 \seealso{
 \code{\link{GDINA}}, \code{\link{mesaplot}}
 }
-
+\author{
+{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+}

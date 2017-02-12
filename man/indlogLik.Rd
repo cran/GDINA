@@ -15,4 +15,3 @@ indlogLik(object, ...)
 Extract individual log-likelihood
 See \code{\link{GDINA}} for examples.
 }
-

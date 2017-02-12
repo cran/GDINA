@@ -18,4 +18,3 @@ are given. Based on the Q-matrix, responses of 2000 examinees
 were simulated.
 }
 \keyword{datasets}
-

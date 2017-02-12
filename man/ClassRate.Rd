@@ -43,4 +43,3 @@ CR <- ClassRate(sim$attribute,personparm(GDINA.est))
 CR
 }
 }
-
