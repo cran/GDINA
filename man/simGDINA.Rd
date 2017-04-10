@@ -3,7 +3,7 @@
 \name{simGDINA}
 \alias{simGDINA}
 \alias{extract.simGDINA}
-\title{Simulate responses based on the (sequential) G-DINA models}
+\title{Data simulation based on the G-DINA models}
 \usage{
 simGDINA(N, Q, gs.parm = NULL, model = "GDINA", sequential = FALSE,
   type = "random", catprob.parm = NULL, delta.parm = NULL,

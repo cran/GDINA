@@ -4,12 +4,14 @@
 \alias{hoparm}
 \title{extract higher-order parameters}
 \usage{
-hoparm(object, withSE = FALSE, digits = 4, ...)
+hoparm(object, withSE = FALSE, theta.est = FALSE, digits = 4, ...)
 }
 \arguments{
 \item{object}{estimated GDINA object returned from \code{\link{GDINA}}}
 
 \item{withSE}{estimate standard errors for lambda parameters or not?}
+
+\item{theta.est}{logical; Estimating higher-order person ability or not? The default is \code{FALSE}.}
 
 \item{digits}{how many decimal places for the ouput?}
 

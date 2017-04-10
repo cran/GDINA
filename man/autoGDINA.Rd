@@ -20,7 +20,7 @@ responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be cod
 items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
 entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
 For polytomous attributes, non-zero elements indicate the level
-of attributes that are needed for an individual to answer the item correctly (see Chen, \& de la Torre, 2013).
+of attributes that are needed for an individual to answer the item correctly (see Chen, & de la Torre, 2013).
 Note that for polytomous items, the sequential G-DINA
 model is used and either restricted or unrestricted category-level Q-matrix is needed.
 In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.

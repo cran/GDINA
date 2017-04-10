@@ -22,7 +22,7 @@ mod1 <- GDINA(frac20$dat,frac20$Q,model="DINA")
 mod1
 summary(mod1)
 # Higher order model
-mod2 <- GDINA(frac20$dat,frac20$Q,model="DINA",higher.order=TRUE)
+mod2 <- GDINA(frac20$dat,frac20$Q,model="DINA",att.dist="higher.order")
 mod2
 anova(mod1,mod2)
 }

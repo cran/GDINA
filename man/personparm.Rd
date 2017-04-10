@@ -25,7 +25,7 @@ See \code{\link{GDINA}} for examples. To estimate higher-order person parameters
 see \code{\link{hoparm}}.
 }
 \references{
-Huebner, A., \& Wang, C. (2011). A note on comparing examinee classification methods for cognitive diagnosis models. \emph{Educational and Psychological Measurement, 71}, 407-419.
+Huebner, A., & Wang, C. (2011). A note on comparing examinee classification methods for cognitive diagnosis models. \emph{Educational and Psychological Measurement, 71}, 407-419.
 }
 \author{
 {Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}

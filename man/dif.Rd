@@ -5,8 +5,8 @@
 \alias{summary.dif}
 \title{Differential item functioning for cognitive diagnosis models}
 \usage{
-dif(dat, Q, group, method = "wald", difitem = "all", parm = "delta",
-  digits = 4, SE.type = 2, ...)
+dif(dat, Q, group, method = "wald", LR.type = "free.all", difitem = "all",
+  parm = "delta", digits = 4, SE.type = 2, ...)
 
 \method{summary}{dif}(object, ...)
 }
@@ -18,7 +18,7 @@ responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be cod
 items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
 entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
 For polytomous attributes, non-zero elements indicate the level
-of attributes that are needed for an individual to answer the item correctly (see Chen, \& de la Torre, 2013).
+of attributes that are needed for an individual to answer the item correctly (see Chen, & de la Torre, 2013).
 Note that for polytomous items, the sequential G-DINA
 model is used and either restricted or unrestricted category-level Q-matrix is needed.
 In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.
@@ -30,6 +30,9 @@ its length must be equal to the number of individuals. Only at most two groups c
 
 \item{method}{DIF detection method; It can be \code{"wald"} for Hou, de la Torre, and Nandakumar's (2014)
 Wald test method, and \code{"LR"} for likelihood ratio test.}
+
+\item{LR.type}{Type of likelihood ratio test for DIF detection. It can be \code{'free.all'} or
+\code{'free.one'}.}
 
 \item{difitem}{Items for the DIF detection. By default, all items will be examined.}
 

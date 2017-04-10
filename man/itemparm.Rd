@@ -15,12 +15,13 @@ item success probabilities of each reduced attribute pattern, \code{"catprob"} f
 category success probabilities of each reduced attribute pattern, \code{"LCprob"} for
 item success probabilities of each attribute pattern, \code{"gs"} for guessing and slip parameters,
 \code{"delta"} for delta parameters, \code{"rrum"} for RRUM parameters when items
-are estimated using RRUM and \code{"higher.order"} for higher-order IRT
-parameters. The default is \code{"itemprob"}.}
+are estimated using RRUM. The default is \code{"catprob"}.}
 
 \item{withSE}{show standard errors or not?}
 
-\item{SE.type}{type of standard errors.}
+\item{SE.type}{Type of standard errors. Can be 1, 2 or 3, indicating outer product of gradient (OPG) estimates
+based on itemwise, incomplete or complete information matrix. See Philipp, Strobl, de la Torre, & Zeileis (2016).
+Currently, the OPG method based on the complete information matrix assumes that all latent classes are identifiable.}
 
 \item{digits}{how many decimal places for the ouput?}
 
@@ -32,9 +33,11 @@ item success probabilities of each reduced attribute pattern, \code{"catprob"} f
 category success probabilities of each reduced attribute pattern, \code{"LCprob"} for
 item success probabilities of each attribute pattern,\code{"gs"} for guessing and slip parameters,
 \code{"delta"} for delta parameters, \code{"rrum"} for RRUM parameters when items
-are estimated using RRUM and \code{"higher.order"} for higher-order IRT
-parameters. Standard errors can be estimated if \code{withSE = TRUE}.
+are estimated using RRUM. Standard errors can be estimated if \code{withSE = TRUE}.
 See \code{\link{GDINA}} for examples.
+}
+\references{
+Philipp, M., Strobl, C., de la Torre, J., & Zeileis, A.(2016). On the estima-tion of standard errors in cognitive diagnosis models (Working Papers).   Fac-ulty  of  Economics  and  Statistics,  University  of  Innsbruck.Retrieved  from \url{http://EconPapers.repec.org/RePEc:inn:wpaper:2016-25}
 }
 \author{
 {Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}

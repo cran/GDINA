@@ -20,26 +20,26 @@
 \alias{summary.GDINA}
 \title{Calibrate dichotomous and polytomous responses}
 \usage{
-GDINA(dat, Q, model = "GDINA", sequential = FALSE, item.names = NULL,
-  higher.order = FALSE, higher.order.model = "Rasch",
-  higher.order.method = "MMLE", verbose = 1, catprob.parm = NULL,
-  higher.order.struc.parm = NULL, mono.constraint = FALSE, group = NULL,
-  empirical = !higher.order, att.prior = NULL, att.str = FALSE,
-  lower.p = 1e-04, upper.p = 0.9999, smallNcorrection = c(5e-04, 0.001),
-  nstarts = 1, conv.crit = 0.001, lower.prior = -1,
-  conv.type = "max.p.change", maxitr = 1000, digits = 4, diagnosis = 0,
-  Mstep.warning = FALSE, optimizer = "all", randomseed = 123456,
-  optim.control = list())
+GDINA(dat, Q, model = "GDINA", sequential = FALSE, att.dist = "saturated",
+  att.prior = NULL, att.str = FALSE, mono.constraint = FALSE,
+  group = NULL, verbose = 1, catprob.parm = NULL, lower.p = 1e-04,
+  upper.p = 0.9999, item.names = NULL, nstarts = 1, conv.crit = 0.001,
+  lower.prior = -1, conv.type = "max.p.change", maxitr = 1000,
+  digits = 4, diagnosis = 0, Mstep.warning = FALSE, optimizer = "all",
+  randomseed = 123456, smallNcorrection = c(5e-04, 0.001),
+  higher.order = list(model = "Rasch", method = "MMLE", nquad = 19, type =
+  "testwise", slope.range = c(0.1, 5), intercept.range = c(-3, 3), slope.prior =
+  c(0, 0.25), intercept.prior = c(0, 1)), optim.control = list())
 
 \method{anova}{GDINA}(object, ...)
 
-\method{extract}{GDINA}(object, what, digits = 4, ...)
+\method{extract}{GDINA}(object, what, SE.type = 2, ...)
 
-\method{hoparm}{GDINA}(object, withSE = FALSE, digits = 4, ...)
+\method{hoparm}{GDINA}(object, withSE = FALSE, theta.est = FALSE,
+  digits = 4, ...)
 
 \method{itemparm}{GDINA}(object, what = c("catprob", "itemprob", "LCprob",
-  "gs", "delta", "rrum", "higher.order"), withSE = FALSE, SE.type = 2,
-  digits = 4, ...)
+  "gs", "delta", "rrum"), withSE = FALSE, SE.type = 2, digits = 4, ...)
 
 \method{personparm}{GDINA}(object, what = c("EAP", "MAP", "MLE", "mp"),
   digits = 4, ...)
@@ -68,7 +68,7 @@ responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be cod
 items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
 entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
 For polytomous attributes, non-zero elements indicate the level
-of attributes that are needed for an individual to answer the item correctly (see Chen, \& de la Torre, 2013).
+of attributes that are needed for an individual to answer the item correctly (see Chen, & de la Torre, 2013).
 Note that for polytomous items, the sequential G-DINA
 model is used and either restricted or unrestricted category-level Q-matrix is needed.
 In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.
@@ -82,24 +82,29 @@ It is also possible to specify CDMs using numbers. Particularly, 0,1,2,3,4 and 5
 
 \item{sequential}{logical; \code{TRUE} if the sequential model is fitted for polytomous responses.}
 
-\item{item.names}{A vector giving the item names. By default, items are named as "Item 1", "Item 2", etc.}
+\item{att.dist}{How is the joint attribute distribution estimated? It can be \code{saturated}, indicating that
+the proportion parameter for each permissible latent class is estimated separately; \code{higher.order}, indicating
+that a higher-order joint attribute distribution is assumed (higher-order model can be specified in \code{higher.order} argument);
+or \code{fixed}, indicating that the weights specified in \code{att.prior} argument are fixed in the estimation process.
+If \code{att.prior} is not specified, a uniform joint attribute distribution is employed initially.
+If different groups have different joint attribute distributions, specify \code{att.dist} as a character vector with the same
+number of elements as the number of groups.}
 
-\item{higher.order}{logical; \code{TRUE} indicates a higher-order joint attribute distribution
-is assumed. The default is \code{FALSE}, which means that the saturated attribute distribution is estimated.
-The higher-order model needs to be specified in argument \code{higher.order.model}.}
+\item{att.prior}{A vector of length \eqn{2^K} for single group estimation, or a matrix of dimension \eqn{2^K\times} no. of groups to specify
+attribute prior distribution for \eqn{2^K} latent classes for all groups. Only applicable for dichotomous attributes.
+The sum of all elements does not have to be equal to 1; however, it will be transformed so that the sum is equal to 1
+before model calibration.
+The label for each latent class can be obtained by calling \code{attributepattern(K)}. See \code{examples} for more info.}
 
-\item{higher.order.model}{a character indicating the IRT model for higher-order joint attribute distribution. Can be
-\code{"2PL"}, \code{"1PL"} or \code{"Rasch"}, representing two parameter logistic IRT model,
-one parameter logistic IRT model and Rasch model,
-respectively. For \code{"1PL"} model, a common slope parameter is
-estimated (see \code{Details}). \code{"Rasch"} is the default model when \code{higher.order = TRUE}.}
+\item{att.str}{logical; are attributes structured?}
 
-\item{higher.order.method}{a character indicating the algorithm for the higher-order structural parameter estimation;
-Can be either \code{"MMLE"} using marginal maximum likelihood estimation, or \code{"BL"} based on the Bock and
-Lieberman's (1970) approach. \code{"BL"} is suitable when the number of attributes is few. It is not
-sensitive to sample size but can be very slow if the number of attributes is large.
-\code{"MMLE"}, which is the default, is suitable for most conditions but might be slow if
-sample size is extremely large.}
+\item{mono.constraint}{logical; \code{TRUE} indicates that \eqn{P(\bm{\alpha}_1) <=P(\bm{\alpha}_2)} if
+for all \eqn{k}, \eqn{\alpha_{1k} < \alpha_{2k}}. Can be a vector for each item or nonzero category or a scalar which will be used for all
+items to specify whether monotonicity constraint should be added.}
+
+\item{group}{a scalar indicating which column in \code{dat} is group indicator or
+a numerical vector indicating the group each individual belongs to. If it is a vector,
+its length must be equal to the number of individuals. Only at most two groups can be handled currently.}
 
 \item{verbose}{How to print calibration information
 after each EM iteration? Can be 0, 1 or 2, indicating to print no information,
@@ -107,45 +112,13 @@ information for current iteration, or information for all iterations.}
 
 \item{catprob.parm}{A list of initial success probability parameters for each nonzero category.}
 
-\item{higher.order.struc.parm}{A matrix or data frame providing higher order structural parameters.
-If supplied, it must be of dimension \eqn{K\times 2}.
-The first column is the slope parameters and the second column is the intercept.}
-
-\item{mono.constraint}{logical; \code{TRUE} indicates that \eqn{P(\bm{\alpha}_1) <=P(\bm{\alpha}_2)} if
-for all \eqn{k}, \eqn{\alpha_{1k} <= \alpha_{2k}}. Can be a vector for each item or nonzero category or a scalar which will be used for all
-items to specify whether monotonicity constraint should be added.}
-
-\item{group}{a scalar indicating which column in \code{dat} is group indicator or
-a numerical vector indicating the group each individual belongs to. If it is a vector,
-its length must be equal to the number of individuals. Only at most two groups can be handled currently.}
-
-\item{empirical}{Logical; whether empirical bayes is adopted or not? \code{TRUE} is
-the default when higher order attribute structure is not assumed. If estimating
-higher order structure, it will be \code{FALSE}.}
-
-\item{att.prior}{A vector of length \eqn{2^K} or a matrix of dimension \eqn{2^K\times} no. of groups to specify
-attribute prior distribution for \eqn{2^K} latent classes for all groups. Only applicable for dichotomous attributes.
-The sum of all elements does not have to be equal to 1; however, it will be transformed so that the sum is equal to 1
-before model calibration.
-(1) If \code{empirical=FALSE} and \code{higher.order=FALSE}, the attribute prior distribution is fixed during model
-calibration; (2) if \code{empirical=TRUE} and \code{higher.order=FALSE}, the distribution for all latent classes
-with non-zero priors is updated using the empirical bayes method;
-(3) if \code{empirical=FALSE} and \code{higher.order=TRUE}, the distribution for all latent classes
-with non-zero priors is updated using the specified higher-order model.
-The label for each latent class can be obtained by calling \code{attributepattern(K)}. See \code{examples} for more info.}
-
-\item{att.str}{logical; whether attributes have any structure?}
-
 \item{lower.p}{A vector for each item or nonzero category, or a scalar which will be used for all
 items or nonzero categories to specify the lower bound for success probabilities. The default is \code{1e-4} for all items.}
 
 \item{upper.p}{A vector for each item or nonzero category, or a scalar which will be used for all
 items or nonzero categories to specify the upper bound for success probabilities. The default is 0.9999 for all items.}
 
-\item{smallNcorrection}{A numeric vector with two elements specifying the corrections applied when the expected number of
-individuals in some latent groups are too small. If the expected no. of examinees is less than the second element,
-the first element and two times the first element will be added to the numerator and denominator of the closed-form solution of
-probabilities of success. Only applicable for the G-DINA, DINA and DINO model estimation without monotonic constraints.}
+\item{item.names}{A vector giving the item names. By default, items are named as "Item 1", "Item 2", etc.}
 
 \item{nstarts}{how many sets of starting values? The default is 1.}
 
@@ -164,11 +137,33 @@ the absolute change in deviance.}
 
 \item{diagnosis}{Run in diagnostic mode? If it is 1 or 2, some intermediate results obtained in each iteration can be extracted.}
 
-\item{Mstep.warning}{Logical; Whether the warning message in Mstep, if any, should be output immediately.}
+\item{Mstep.warning}{Logical; Should the warning message in Mstep, if any, be output immediately.}
 
 \item{optimizer}{A string indicating which optimizer should be used in M-step.}
 
 \item{randomseed}{Random seed for generating initial item parameters. The default random seed is 123456.}
+
+\item{smallNcorrection}{A numeric vector with two elements specifying the corrections applied when the expected number of
+individuals in some latent groups are too small. If the expected no. of examinees is less than the second element,
+the first element and two times the first element will be added to the numerator and denominator of the closed-form solution of
+probabilities of success. Only applicable for the G-DINA, DINA and DINO model estimation without monotonic constraints.}
+
+\item{higher.order}{A list specifying the higher-order joint attribute distribution with the following components:
+(1) \code{model} - a character indicating the IRT model for higher-order joint attribute distribution. Can be
+\code{"2PL"}, \code{"1PL"} or \code{"Rasch"}, representing two parameter logistic IRT model,
+one parameter logistic IRT model and Rasch model,
+respectively. For \code{"1PL"} model, a common slope parameter is
+estimated (see \code{Details}). \code{"Rasch"} is the default model when \code{att.dist = "higher.order"}.
+(2) \code{method} - a character indicating the algorithm for the higher-order structural parameter estimation;
+Can be either \code{"BL"}, \code{"MMLE"}, which is the default, or \code{"BMLE"}, which allows parameter priors to be imposed.
+(3) \code{nquad} - a scalar specifying the number of integral nodes. (4) \code{type} - a character specifying
+whether all higher-order structural parameters are estimated at the same time (i.e., \code{type="testwise"}) or
+estimated attribute by attribute (i.e., \code{type="attwise"}, only applicable when \code{method="MMLE"} or \code{method="BMLE"}).
+(5) \code{slope.range} - a vector of length two specifying
+the range of slope parameters. (6) \code{intercept.range} - a vector of length two specifying
+the range of intercept parameters. (7) \code{slope.prior} - a vector of length two specifying
+the mean and variance of log(slope) parameters, which are assumed normally distributed. (8) \code{intercept.prior} -
+a vector of length two specifying the mean and variance of intercept parameters, which are assumed normally distributed.}
 
 \item{optim.control}{Control options for optimizers in the M-step. Only available when \code{optimizer} is one specific optimization
 method, including \code{BFGS} from \link[stats]{optim}, \link[nloptr]{slsqp}, \link[Rsolnp]{solnp} and \link[alabama]{auglag}.
@@ -180,12 +175,14 @@ For the \link[alabama]{auglag} method, \code{optim.control} specifies \code{cont
 
 \item{what}{argument for various S3 methods}
 
-\item{withSE}{argument for S3 method \code{\link{itemparm}}; show standard errors or not?}
-
 \item{SE.type}{type of standard errors.}
+
+\item{withSE}{argument for method \code{\link{itemparm}}; show standard errors or not?}
+
+\item{theta.est}{logical; Estimating higher-order person ability or not? The default is \code{FALSE}.}
 }
 \value{
-\code{GDINA} returns an object of class \code{GDINA}. S3 methods for \code{GDINA} objects
+\code{GDINA} returns an object of class \code{GDINA}. Methods for \code{GDINA} objects
  include \code{\link{extract}} for extracting various components, \code{\link{itemparm}}
  for extracting item parameters, \code{\link{personparm}}
  for calculating person parameters, \code{summary} for summary information.
@@ -194,7 +191,7 @@ For the \link[alabama]{auglag} method, \code{optim.control} specifies \code{cont
 }
 \description{
 \code{GDINA} calibrates the generalized deterministic inputs, noisy and
-gate (G-DINA; de la Torre, 2011) model for dichotomous responses, and the sequential
+gate (G-DINA; de la Torre, 2011) model for dichotomous responses, and its extension, the sequential
 G-DINA model (Ma, & de la Torre, 2016a) for ordinal and nominal responses.
 By setting appropriate constraints, the deterministic inputs,
 noisy and gate (DINA; de la Torre, 2009; Junker & Sijtsma, 2001) model,
@@ -206,16 +203,16 @@ the C-RUM (Hartz, 2002), a special case of the GDM (von Davier, 2008), and that 
 is also known as a special case of the generalized NIDA model (de la Torre, 2011).
 Different models can be fitted to different
 items in a single test. The attributes can be either dichotomous or polytomous
-(Chen & de la Torre, 2013). Joint attribute distribution can be saturated, structured or higher-order,
+(Chen & de la Torre, 2013). Joint attribute distribution can be saturated, structured or higher-order
 (de la Torre & Douglas, 2004) when attributes are binary.
 Marginal maximum likelihood method with Expectation-Maximization (MMLE/EM) alogrithm
 is used for item parameter estimation.
 
-To compare two \code{GDINA} models, use method \code{\link{anova}}.
+To compare two or more \code{GDINA} models, use method \code{\link{anova}}.
 
 To extract higher-order parameters, use method \code{\link{hoparm}}.
 
-To extract lower-order structural (item) parameters, use S3 method \code{\link{itemparm}}.
+To extract lower-order structural (item) parameters, use method \code{\link{itemparm}}.
 
 To calculate lower-order incidental (person) parameters
 use method \code{\link{personparm}}. To extract other components returned, use \code{\link{extract}}.
@@ -356,7 +353,7 @@ close-form solutions, which can be implemented in a straightforward
 manner using the observation-coding (Tutz, 1997).
 
 For estimating the joint attribute
-distribution, by default, an empirical Bayes method (Carlin & Louis, 2000) is adopted, which is referred to as
+distribution, by default, an empirical Bayes method (\code{saturated}; Carlin & Louis, 2000) is adopted, which is referred to as
 the saturated attribute structure. Specifically,
 the prior distribution of joint attributes is uniform at the beginning, and then updated after
 each EM iteration based on the posterior distribution.
@@ -376,9 +373,7 @@ where \eqn{\theta_i} is the ability of examinee \eqn{i}. \eqn{\lambda_{0k}} and 
 and slope parameters for attribute \eqn{k}, respectively. In the Rasch model, \eqn{\lambda_{1k}=1 \forall k};
 whereas in the 1PL model, a common slope parameter \eqn{\lambda_{1}} is estimated.
 The probability of joint attributes can be written as
- \deqn{P(\strong{\alpha}|\theta_i,\strong{\lambda})=\prod_k P(\alpha_k|\theta_i,\strong{\lambda})}
-To estimate the parameters for higher order IRT model, either Bock and Aitkin's (1981) MMLE/EM algorithm or
-Bock and Lieberman's (BL; 1970) method can be used.
+ \deqn{P(\strong{\alpha}|\theta_i,\strong{\lambda})=\prod_k P(\alpha_k|\theta_i,\strong{\lambda})}.
 }
 
 \section{The Number of Parameters}{
@@ -469,7 +464,7 @@ itemparm(mod3, what = "gs") # guess and slip parameters
 itemparm(mod3, what = "gs",withSE = TRUE) # guess and slip parameters + standard errors
 
 # Model comparison at test level via likelihood ratio test
-anova(mod1,mod3)
+anova(mod1,mod2,mod3)
 
 # --------- ACDM model -------#
 dat <- sim10GDINA$simdat
@@ -493,7 +488,7 @@ dat <- sim10GDINA$simdat
 Q <- sim10GDINA$simQ
 models <- c(rep("GDINA",3),"LLM","DINA","DINO","ACDM","RRUM","LLM","RRUM")
 mod5 <- GDINA(dat = dat, Q = Q, model = models)
-anova(mod1,mod5)
+anova(mod1,mod2,mod3,mod4,mod4b,mod4c,mod5)
 
 
 ####################################
@@ -520,29 +515,29 @@ itemparm(mod11d,"rrum")
 ####################################
 #           Example 3.             #
 #        Model estimations         #
-# With Higher order att structure  #
+# With Higher-order att structure  #
 ####################################
 
 dat <- sim10GDINA$simdat
 Q <- sim10GDINA$simQ
 # --- Higher order G-DINA model ---#
-mod12 <- GDINA(dat = dat, Q = Q, model = "GDINA",
-               higher.order = TRUE,higher.order.method="BL")
+mod12 <- GDINA(dat = dat, Q = Q, model = "DINA",
+               att.dist="higher.order",higher.order=list(method="MMLE",nquad=31))
 hoest=hoparm(mod12) # extract higher-order parameters
 hoest$theta # ability
 hoest$lambda # structural parameters
 # --- Higher order DINA model ---#
 mod22 <- GDINA(dat = dat, Q = Q, model = "DINA",
-               higher.order = TRUE,higher.order.method="MMLE")
+               att.dist="higher.order",higher.order=list(method="BMLE"))
 # --- Higher order DINO model ---#
-mod23 <- GDINA(dat = dat, Q = Q, model = "DINO",higher.order = TRUE)
+mod23 <- GDINA(dat = dat, Q = Q, model = "DINO",att.dist="higher.order")
 # --- Higher order ACDM model ---#
 mod24 <- GDINA(dat = dat, Q = Q, model = "ACDM",
-               higher.order = TRUE,higher.order.model="1PL")
+               att.dist="higher.order",higher.order=list(model="1PL"))
 # --- Higher order LLM model ---#
-mod25 <- GDINA(dat = dat, Q = Q, model = "LLM",higher.order = TRUE)
+mod25 <- GDINA(dat = dat, Q = Q, model = "LLM",att.dist="higher.order")
 # --- Higher order RRUM model ---#
-mod26 <- GDINA(dat = dat, Q = Q, model = "RRUM",higher.order = TRUE)
+mod26 <- GDINA(dat = dat, Q = Q, model = "RRUM",att.dist="higher.order")
 
 ####################################
 #          Example 4.              #
@@ -557,10 +552,10 @@ mod26 <- GDINA(dat = dat, Q = Q, model = "RRUM",higher.order = TRUE)
 # Note that the sum is equal to 1
 #
 prior <- c(0.1,0.1,0.1,0.1,0.15,0.15,0.15,0.15)
-# fit GDINA model  - empirical must be FALSE
+# fit GDINA model  with fixed prior dist.
 dat <- sim10GDINA$simdat
 Q <- sim10GDINA$simQ
-modp1 <- GDINA(dat = dat, Q = Q, att.prior = prior, att.str = TRUE, empirical = FALSE)
+modp1 <- GDINA(dat = dat, Q = Q, att.prior = prior, att.dist = "fixed")
 # See the posterior weights
 extract(modp1,what = "posterior.prob")
 extract(modp1,what = "att.prior")
@@ -587,16 +582,20 @@ extract(modp1,what = "att.prior")
               matrix(rep(c(1,1,0),1000),ncol=3,byrow=TRUE),
               matrix(rep(c(1,1,1),2500),ncol=3,byrow=TRUE))
  # data simulation
- simD <- simGDINA(N,Q,gs.parm = gs,
-                   model = "DINA",attribute = att)
+ simD <- simGDINA(N,Q,gs.parm = gs, model = "DINA",attribute = att)
  dat <- simD$dat
  # setting structure: A1 -> A2 -> A3
  # note: latent classes with prior 0 are assumed impossible
  prior <- c(0.1,0.2,0,0,0.2,0,0,0.5)
- out <- GDINA(dat,Q,att.prior=prior,att.str = TRUE, model="DINA")
+ out <- GDINA(dat, Q, att.prior = prior,att.str = TRUE, att.dist = "fixed", model = "DINA")
  # check posterior dist.
  extract(out,what = "posterior.prob")
+ extract(out,what = "att.prior")
 
+ out2 <- GDINA(dat, Q, att.prior = prior,att.str = TRUE, att.dist = "saturated",model = "DINA")
+ # check posterior dist.
+ extract(out2,what = "posterior.prob")
+ extract(out2,what = "att.prior")
 
 ####################################
 #          Example 5.              #
@@ -625,13 +624,13 @@ true.att <- attributepattern(K)[true.lc,]
                    model = "DINA",attribute = true.att)
  dat <- extract(simD,"dat")
 
-modp1 <- GDINA(dat = dat, Q = Q, att.prior = struc$att.prob, att.str = TRUE, empirical = FALSE)
+modp1 <- GDINA(dat = dat, Q = Q, att.prior = struc$att.prob, att.str = TRUE, att.dist = "saturated")
 modp1
 # Note that fixed priors were used for all iterations
 extract(modp1,what = "att.prior")
 # Posterior weights were slightly different
 extract(modp1,what = "posterior.prob")
-modp2 <- GDINA(dat = dat, Q = Q, att.prior = struc$att.prob, att.str = TRUE, empirical = TRUE)
+modp2 <- GDINA(dat = dat, Q = Q, att.prior = struc$att.prob, att.str = TRUE, att.dist = "fixed")
 modp2
 extract(modp2,what = "att.prior")
 extract(modp2,what = "posterior.prob")
@@ -648,14 +647,14 @@ extract(modp2,what = "posterior.prob")
  dat <- sim10GDINA$simdat
  Q <- sim10GDINA$simQ
  mod.ini <- GDINA(dat,Q,catprob.parm = initials)
-
+ extract(mod.ini,"initial.catprob")
 ####################################
 #           Example 7.             #
-#        Model estimations         #
+#        Model estimation          #
 #          Without M-step          #
 ####################################
 
- # -----------Fix User specified item parameters
+ # -----------Fix User-specified item parameters
  # Item parameters are not estimated
  # Only person attributes are estimated
  # attribute prior distribution matters if interested in the marginalized likelihood
@@ -665,7 +664,7 @@ extract(modp2,what = "posterior.prob")
  par <- itemparm(mod.initial,digits=8)
  weights <- extract(mod.initial,"posterior.prob",digits=8) #posterior weights
  # use the weights as the priors
- mod.fix <- GDINA(dat,Q,catprob.parm = par,att.prior=weights,maxitr=0) # re-estimation
+ mod.fix <- GDINA(dat,Q,catprob.parm = par,att.prior=c(weights),maxitr=0) # re-estimation
  anova(mod.initial,mod.fix) # very similar - good approximation most of time
  # prior used for the likelihood calculation for the last step
  priors <- extract(mod.initial,"att.prior")
@@ -741,10 +740,17 @@ sim2 <- simGDINA(N2,Q,gs.parm = gs2,model = "DINO")
 # see ?bdiagMatrix
 dat <- bdiagMatrix(list(extract(sim1,"dat"),extract(sim2,"dat")),fill=NA)
 Q <- rbind(Q,Q)
-
+gr <- rep(c("female","male"),each=2000)
 # Fit G-DINA model
-mg.est <- GDINA(dat = dat,Q = Q,group = rep(c("female","male"),each=2000))
+mg.est <- GDINA(dat = dat,Q = Q,group = gr)
+summary(mg.est)
 extract(mg.est,"posterior.prob")
+
+# Fit G-DINA model with different joint attribute dist.
+mg.est2 <- GDINA(dat = dat,Q = Q,group = gr,
+att.dist = c("saturated","fixed"))
+summary(mg.est2)
+
 }
 
 }

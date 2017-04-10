@@ -4,14 +4,12 @@
 \alias{extract}
 \title{extract elements from objects of various classes}
 \usage{
-extract(object, what, digits = 4, ...)
+extract(object, what, ...)
 }
 \arguments{
 \item{object}{objects from class \code{GDINA},\code{itemfit}, \code{modelcomp}, \code{Qval} or \code{simGDINA}}
 
 \item{what}{what to extract}
-
-\item{digits}{how many decimal places for the output?}
 
 \item{...}{additional arguments}
 }
@@ -25,68 +23,65 @@ To see what can be extracted from \code{\link{itemfit}}, \code{\link{modelcomp}}
 Objects which can be extracted from \code{GDINA} objects include:
 
 \describe{
-\item{itemprob.parm}{item success probability for each latent group}
-\item{delta.parm}{delta parameters for each category}
-\item{catprob.parm}{category success probability for each latent group; the same as itemprob.parm for dichotomous response items.}
-\item{LCprob.parm}{category success probability for each latent class}
-\item{itemprob.se}{SE associated with the item success probability for each latent group; need to specify either type=1 or type=2.}
-\item{catprob.se}{SE associated with the category success probability for each latent group; need to specify either type=1 or type=2.}
-\item{delta.se}{SE associated with the category success probability for each latent group; need to specify either type=1 or type=2.}
-\item{higher.order.struc.parm}{higher-order structural parameters}
-\item{higher.order.struc.se}{SE associated with higher-order structural parameters}
-  \item{logLik}{observed log-likelihood value}
-  \item{deviance}{deviance: -2 times observed log-likelihood value}
   \item{AIC}{AIC}
+  \item{att.prior}{attribute prior weights for calculating marginalized likelihood in the last iteration}
+ \item{att.str}{argument att.str}
   \item{BIC}{BIC}
+\item{call}{function call}
+\item{catprob.parm}{category success probability for each latent group; the same as itemprob.parm for dichotomous response items.}
+\item{catprob.se}{SE associated with the category success probability for each latent group.}
+\item{catprob.cov}{variance-covariance matrix of item endorsement probabilities for all items}
+\item{conv.crit}{argument conv.crit}
+ \item{dat}{item responses analyzed}
+\item{delta.parm}{delta parameters for each category}
+\item{delta.cov}{Convariance matrix associated with the delta parameters.}
+\item{delta.se}{SE associated with the delta parameters for each latent group.}
+  \item{deviance}{deviance: -2 times observed log-likelihood value}
+\item{dif.LL}{absolute change in deviance in the last EM iteration}
+\item{dif.p}{max absolute change in success probabilities in the last EM iteration}
+\item{digits}{argument digits}
+  \item{discrim}{GDINA discrimination index}
+\item{empirical}{argument empirical}
+  \item{end.time}{end time}
+\item{expectedCorrect}{expected # of examinees in each latent group answering item correctly}
+\item{expectedTotal}{expected # of examinees in each latent group}
+\item{higher.order}{higher-order model specifications}
+\item{higher.order.method}{argument higher.order$method}
+\item{higher.order.model}{argument higher.order$model}
+\item{HO.parm.history}{HO.parm.history in diagnosis mode}
+\item{initial.catprob}{initial item category probability parameters}
+\item{iter.history}{iter.history in diagnosis mode}
+\item{item.names}{argument item.names}
+\item{itemprob.history}{itemprob.history in diagnosis mode}
+\item{itemprob.parm}{item success probability for each latent group}
+\item{itemprob.se}{SE associated with the item success probability for each latent group.}
+\item{LCprob.parm}{category success probability for each latent class}
+  \item{logLik}{observed log-likelihood value}
+\item{loglikelihood.i}{log-likelihood for each examinee}
+\item{likepost.history}{likepost.history in diagnosis mode}
+\item{logposterior.i}{log-posteriori for each examinee}
+\item{maxitr}{argument maxitr}
   \item{models}{fitted CDMs for each item/category}
+\item{mono.constraint}{argument mono.constraint}
+  \item{natt}{number of attributes}
+  \item{ncat}{number of categories excluding category zero}
+  \item{ngroup}{number of groups}
+  \item{nitem}{number of items}
+  \item{nitr}{number of iterations}
+  \item{nobs}{number of individuals}
   \item{npar}{number of parameters}
   \item{npar.item}{number of item parameters}
   \item{npar.att}{number of attribute parameters}
-  \item{nobs}{number of individuals}
-  \item{nitem}{number of items}
-  \item{ncat}{number of categories excluding category zero}
-  \item{natt}{number of attributes}
-  \item{nitr}{number of iterations}
-  \item{ngroup}{number of groups}
-  \item{discrim}{GDINA discrimination index}
+\item{nstarts}{argument nstarts}
+  \item{prevalence}{prevalence of each attribute}
   \item{posterior.prob}{posterior weights for each latent class}
-  \item{att.prior}{attribute prior weights for calculating marginalized likelihood in the last iteration}
-  \item{time}{time used}
-  \item{start.time}{starting time}
-  \item{end.time}{end time}
-  \item{dat}{item responses analyzed}
   \item{Q}{Q-matrix}
   \item{Qc}{Qc-matrix}
-  \item{prevalence}{prevalence of each attribute}
-\item{itemprob.cov}{variance-covariance matrix of item endorsement probabilities for all items}
-\item{itemprob.covindex}{index of the variance-covariance matrix of item endorsement probabilities for all items}
-\item{logposterior.i}{log-posteriori for each examinee}
-\item{loglikelihood.i}{log-likelihood for each examinee}
-\item{expectedCorrect}{expected # of examinees in each latent group answering item correctly}
-\item{expectedTotal}{expected # of examinees in each latent group}
-\item{dif.LL}{absolute change in deviance in the last EM iteration}
-\item{dif.p}{max absolute change in success probabilities in the last EM iteration}
-\item{higher.order}{argument higher.order}
-\item{higher.order.model}{argument higher.order.model}
-\item{mono.constraint}{argument mono.constraint}
-\item{SE}{argument SE}
-\item{SE.type}{argument SE.type}
-\item{empirical}{argument empirical}
-\item{att.str}{argument att.str}
-\item{nstarts}{argument nstarts}
-\item{conv.crit}{argument conv.crit}
-\item{maxitr}{argument maxitr}
-\item{higher.order.method}{argument higher.order.method}
-\item{verbose}{argument verbose}
-\item{sequential}{argument sequential}
-\item{higher.order.parm}{argument higher.order.parm}
-\item{digits}{argument digits}
-\item{item.names}{argument item.names}
-\item{itemprob.history}{itemprob.history in diagnosis mode}
 \item{RN.history}{RN.history in diagnosis mode}
-\item{likepost.history}{likepost.history in diagnosis mode}
-\item{iter.history}{iter.history in diagnosis mode}
-\item{HO.parm.history}{HO.parm.history in diagnosis mode}
-\item{call}{function call}
+  \item{start.time}{starting time}
+\item{sequential}{argument sequential}
+\item{seq.dat}{data for sequential models}
+  \item{time}{time used}
+\item{verbose}{argument verbose}
 }
 }

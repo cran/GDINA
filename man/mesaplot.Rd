@@ -5,7 +5,8 @@
 \title{Mesa plot for Q-matrix validation}
 \usage{
 mesaplot(Qval.obj, item, type = "best", no.qvector = 10,
-  data.label = FALSE, original.q.label = TRUE, auto.ylim = TRUE, ...)
+  data.label = TRUE, eps = 0.95, original.q.label = FALSE,
+  auto.ylim = TRUE, ...)
 }
 \arguments{
 \item{Qval.obj}{model object of class \code{Qvalidation}}
@@ -22,11 +23,13 @@ which means the 10 q vectors with the largest PVAFs are plotted.}
 
 \item{data.label}{logical; To show data label or not?}
 
+\item{eps}{the cutoff for PVAF. If not \code{NULL}, it must be a value between 0 and 1. A horizontal line will be drawn accordingly.}
+
 \item{original.q.label}{logical; print the label showing the original q-vector or not?}
 
 \item{auto.ylim}{logical; create y range automatically or not?}
 
-\item{...}{additional arguments}
+\item{...}{additional arguments passed to \code{plot} function}
 }
 \description{
 Mesa plot for Q-matrix validation
@@ -39,8 +42,8 @@ Q[1,] <- c(0,1,0)
 mod1 <- GDINA(dat = dat, Q = Q, model = "GDINA")
 out <- Qval(mod1,eps = 0.9)
 item <- c(1,2,10)
-mesaplot(out,item=item,data.label=TRUE,type="all")
-mesaplot(out,item=10,type="best")
+mesaplot(out,item=item,data.label=FALSE,type="all")
+mesaplot(out,item=10,type="best",eps=0.95)
 mesaplot(out,item=10,type="all",no.qvector=5)
 }
 
