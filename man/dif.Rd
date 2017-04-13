@@ -5,8 +5,9 @@
 \alias{summary.dif}
 \title{Differential item functioning for cognitive diagnosis models}
 \usage{
-dif(dat, Q, group, method = "wald", LR.type = "free.all", difitem = "all",
-  parm = "delta", digits = 4, SE.type = 2, ...)
+dif(dat, Q, group, method = "wald", p.adjust.methods = "bonferroni",
+  LR.type = "free.all", difitem = "all", parm = "delta", digits = 4,
+  SE.type = 2, ...)
 
 \method{summary}{dif}(object, ...)
 }
@@ -30,6 +31,11 @@ its length must be equal to the number of individuals. Only at most two groups c
 
 \item{method}{DIF detection method; It can be \code{"wald"} for Hou, de la Torre, and Nandakumar's (2014)
 Wald test method, and \code{"LR"} for likelihood ratio test.}
+
+\item{p.adjust.methods}{adjusted p-values for multiple hypothesis tests. This is conducted using \code{p.adjust} function in \pkg{stats},
+and therefore all adjustment methods supported by \code{p.adjust} can be used, including \code{"holm"},
+\code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"} and \code{"BY"}. See \code{p.adjust}
+for more details. \code{"bonferroni"} is the default.}
 
 \item{LR.type}{Type of likelihood ratio test for DIF detection. It can be \code{'free.all'} or
 \code{'free.one'}.}

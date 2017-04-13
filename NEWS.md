@@ -1,3 +1,7 @@
+# GDINA 1.4.2
+* Fixed     - a bug in `modelcomp` in the version 1.4.1
+* Changed   - adjusted p values are provided for DIF detection
+
 # GDINA 1.4.1
 * Changed   - update GUI interface `startGDINA` to report absolute fit statistics
 * Changed   - estimation methods for higher-order models were adjusted
@@ -14,7 +18,6 @@
 * Fixed     - bug for calculating standard errors for sequential models
 * Fixed     - bug - recover the random seeds after running `GDINA` and `itemfit`
 * Added     - standard errors using complete information matrix
-* Added     - bootstrap procedures are provided
 * Added     - output for `initial.catprob` in `extract` function
 * Added     - function `LC2LG` to find equivalent latent groups
 * Added     - function `score` to find score functions

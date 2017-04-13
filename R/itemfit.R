@@ -201,8 +201,7 @@ itemfit <- function(GDINA.obj,person.sim = "post",p.adjust.methods = "bonferroni
         stats::p.adjust(l.pairs$unadj.pvalue[loc], method = p.adjust.methods)[which.max(l.pairs$zstat[loc])]
       )
   }
-  max.itemlevel.fit <-
-    round(cbind(p$zstat, p$unadj.pvalue, max.itemlevel.fit), digits)
+  max.itemlevel.fit <- round(cbind(p$zstat, p$unadj.pvalue, max.itemlevel.fit), digits)
   colnames(max.itemlevel.fit) <-
     c(
       "z.prop",
@@ -214,7 +213,7 @@ itemfit <- function(GDINA.obj,person.sim = "post",p.adjust.methods = "bonferroni
       "pvalue.max[z.logOR]",
       "adj.pvalue.max[z.logOR]"
     )
-  rownames(max.itemlevel.fit) <- paste("Item", 1:J)
+  rownames(max.itemlevel.fit) <- extract(GDINA.obj,"item.names")
   r.pairs <-
     data.frame(item.pair.1 = itempair[, 1],
                item.pair.2 = itempair[, 2],
@@ -223,7 +222,7 @@ itemfit <- function(GDINA.obj,person.sim = "post",p.adjust.methods = "bonferroni
     data.frame(item.pair.1 = itempair[, 1],
                item.pair.2 = itempair[, 2],
                round(l.pairs, digits))
-  p <- data.frame(item = c(1:J), round(p, digits))
+  p <- data.frame(item = 1:J, round(p, digits),row.names = extract(GDINA.obj,"item.names"))
 
   if (!is.null(oldseed))
     .GlobalEnv$.Random.seed <- oldseed
