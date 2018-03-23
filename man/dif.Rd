@@ -6,7 +6,7 @@
 \title{Differential item functioning for cognitive diagnosis models}
 \usage{
 dif(dat, Q, group, method = "wald", p.adjust.methods = "bonferroni",
-  LR.type = "free.all", difitem = "all", parm = "delta", digits = 4,
+  LR.type = "free.all", LR.approx = FALSE, difitem = "all", digits = 4,
   SE.type = 2, ...)
 
 \method{summary}{dif}(object, ...)
@@ -15,22 +15,21 @@ dif(dat, Q, group, method = "wald", p.adjust.methods = "bonferroni",
 \item{dat}{A required \eqn{N \times J} \code{matrix} or \code{data.frame} consisting of the
 responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be coded as \code{NA}.}
 
-\item{Q}{A required \eqn{J \times K} item or category and attribute association matrix, wher \eqn{J} represents the number of
-items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
-entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
-For polytomous attributes, non-zero elements indicate the level
-of attributes that are needed for an individual to answer the item correctly (see Chen, & de la Torre, 2013).
-Note that for polytomous items, the sequential G-DINA
-model is used and either restricted or unrestricted category-level Q-matrix is needed.
-In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.
-The second column indicates the category number. See \code{Examples}.}
+\item{Q}{A required matrix; The number of rows occupied by a single-strategy dichotomous item is 1, by a polytomous item is
+the number of nonzero categories, and by a mutiple-strategy dichotomous item is the number of strategies.
+The number of column is equal to the number of attributes if all items are single-strategy dichotomous items, but
+the number of attributes + 2 if any items are polytomous or have multiple strategies.
+For a polytomous item, the first column represents the item number and the second column indicates the nonzero category number.
+For a multiple-strategy dichotomous item, the first column represents the item number and the second column indicates the strategy number.
+For binary attributes, 1 denotes the attributes are measured by the items and 0 means the attributes are not
+   measured. For polytomous attributes, non-zero elements indicate which level
+   of attributes are needed (see Chen, & de la Torre, 2013).  See \code{Examples}.}
 
-\item{group}{a scalar indicating which column in \code{dat} is group indicator or
-a numerical vector indicating the group each individual belongs to. If it is a vector,
-its length must be equal to the number of individuals. Only at most two groups can be handled currently.}
+\item{group}{a numerical vector with integer 1, 2, ..., # of groups indicating the group each individual belongs to. It must start from 1 and its
+length must be equal to the number of individuals.}
 
 \item{method}{DIF detection method; It can be \code{"wald"} for Hou, de la Torre, and Nandakumar's (2014)
-Wald test method, and \code{"LR"} for likelihood ratio test.}
+Wald test method, and \code{"LR"} for likelihood ratio test (Ma, Terzi, Lee,& de la Torre, 2017).}
 
 \item{p.adjust.methods}{adjusted p-values for multiple hypothesis tests. This is conducted using \code{p.adjust} function in \pkg{stats},
 and therefore all adjustment methods supported by \code{p.adjust} can be used, including \code{"holm"},
@@ -40,10 +39,9 @@ for more details. \code{"bonferroni"} is the default.}
 \item{LR.type}{Type of likelihood ratio test for DIF detection. It can be \code{'free.all'} or
 \code{'free.one'}.}
 
-\item{difitem}{Items for the DIF detection. By default, all items will be examined.}
+\item{LR.approx}{Whether an approximated LR test is implemented? If TRUE, anchor item parameters will not be re-estimated but fixed.}
 
-\item{parm}{The type of parameters associated with the Wald test for the DIF detection. It can be either \code{"itemprob"}
-or \code{"delta"} for item probabilities and delta parameters, respectively.}
+\item{difitem}{Items for the DIF detection. By default, all items will be examined.}
 
 \item{digits}{How many decimal places in each number? The default is 4.}
 
@@ -51,14 +49,15 @@ or \code{"delta"} for item probabilities and delta parameters, respectively.}
 
 \item{...}{Other arguments passed to GDINA function for model calibration}
 
-\item{object}{estimated GDINA object for various S3 methods}
+\item{object}{GDINA object for various S3 methods}
 }
 \value{
 A data frame giving the Wald statistics and associated p-values.
 }
 \description{
 This function is used to detect differential item functioning based on the models estimated
-in the \code{\link{GDINA}} function using the Wald test (Hou, de la Torre, & Nandakumar, 2014)
+in the \code{\link{GDINA}} function using the Wald test (Hou, de la Torre, & Nandakumar, 2014) and the likelihood ratio
+test (Ma, Terzi, Lee, & de la Torre, 2017). It can only detect DIF for two groups currently.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -68,7 +67,7 @@ in the \code{\link{GDINA}} function using the Wald test (Hou, de la Torre, & Nan
 \examples{
 \dontrun{
 set.seed(123456)
-N <- 1000
+N <- 3000
 Q <- sim10GDINA$simQ
 gs <- matrix(c(0.1,0.2,
                        0.1,0.2,
@@ -85,19 +84,20 @@ gs <- matrix(c(0.1,0.2,
 sim1 <- simGDINA(N,Q,gs.parm = gs,model="DINA")
 sim2 <- simGDINA(N,Q,gs.parm = gs,model=c(rep("DINA",9),"DINO"))
 dat <- rbind(extract(sim1,"dat"),extract(sim2,"dat"))
-gr <- c(rep("male",N),rep("female",N))
+gr <- c(rep(1,N),rep(2,N))
 dif.out <- dif(dat,Q,group=gr)
-plotIRF(dif.out,4)
 dif.out2 <- dif(dat,Q,group=gr,method="LR")
 }
 }
 \references{
 Hou, L., de la Torre, J., & Nandakumar, R. (2014). Differential item functioning assessment in cognitive diagnostic modeling: Application of the Wald test to
 investigate DIF in the DINA model. \emph{Journal of Educational Measurement, 51}, 98-125.
+
+Ma, W., Terzi, R., Lee, S., & de la Torre, J. (2017, April). Multiple group cognitive diagnosis models and their applications in detecting differential item functioning. Paper presented at the Annual Meeting ofthe American Educational Research Association, San Antonio, TX.
 }
 \seealso{
 \code{\link{GDINA}}
 }
 \author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }

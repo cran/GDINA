@@ -1,35 +1,29 @@
-#'@include GDINA-package.R GDINA.R
-#'@title extract lower-order structural (item) parameters
+#'@title extract item parameters (deprecated)
 #'
 #' @description
-#' Function to extract various item parameters, including \code{"itemprob"} for
-#' item success probabilities of each reduced attribute pattern, \code{"catprob"} for
-#' category success probabilities of each reduced attribute pattern, \code{"LCprob"} for
-#' item success probabilities of each attribute pattern,\code{"gs"} for guessing and slip parameters,
-#' \code{"delta"} for delta parameters, \code{"rrum"} for RRUM parameters when items
-#' are estimated using RRUM. Standard errors can be estimated if \code{withSE = TRUE}.
-#' See \code{\link{GDINA}} for examples.
+#'
+#' This function has been deprecated; use \code{coef} instead.
 #'
 #' @param object estimated GDINA object returned from \code{\link{GDINA}}
-#' @param what what to show; It can be \code{"itemprob"} for
-#' item success probabilities of each reduced attribute pattern, \code{"catprob"} for
-#' category success probabilities of each reduced attribute pattern, \code{"LCprob"} for
-#' item success probabilities of each attribute pattern, \code{"gs"} for guessing and slip parameters,
-#' \code{"delta"} for delta parameters, \code{"rrum"} for RRUM parameters when items
-#' are estimated using RRUM. The default is \code{"catprob"}.
+#' @param what what to show.
 #' @param withSE show standard errors or not?
-#' @param SE.type Type of standard errors. Can be 1, 2 or 3, indicating outer product of gradient (OPG) estimates
-#' based on itemwise, incomplete or complete information matrix. See Philipp, Strobl, de la Torre, & Zeileis (2016).
-#' Currently, the OPG method based on the complete information matrix assumes that all latent classes are identifiable.
+#' @param SE.type Type of standard errors.
 #' @param digits how many decimal places for the ouput?
 #' @param ... additional arguments
 #'
-#'
-#' @author {Wenchao Ma, Rutgers University, \email{wenchao.ma@@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+#' @examples
+#' \dontrun{
+#' dat <- sim10GDINA$simdat
+#' Q <- sim10GDINA$simQ
+#' fit <- GDINA(dat = dat, Q = Q, model = "GDINA")
+#' # deprecated
+#' itemparm(fit)
+#' coef(fit)
+#'}
 #'
 #' @references
 #'
-#' Philipp, M., Strobl, C., de la Torre, J., & Zeileis, A.(2016). On the estima-tion of standard errors in cognitive diagnosis models (Working Papers).   Fac-ulty  of  Economics  and  Statistics,  University  of  Innsbruck.Retrieved  from \url{http://EconPapers.repec.org/RePEc:inn:wpaper:2016-25}
+#' Philipp, M., Strobl, C., de la Torre, J., & Zeileis, A.(2017). On the estimation of standard errors in cognitive diagnosis models. \emph{Journal of Educational and Behavioral Statistics, 43}, 88-115.
 #'
 #'@export
 itemparm <- function(object,
@@ -39,21 +33,12 @@ itemparm <- function(object,
 }
 
 
-#' @title NULL
-#' @description To extract lower-order structural (item) parameters, use method \code{\link{itemparm}}.
-#' @param object estimated GDINA object for various S3 methods
-#' @param what argument for various S3 methods
-#' @param withSE argument for method \code{\link{itemparm}}; show standard errors or not?
-#' @param SE.type type of standard errors.
-#' @param digits How many decimal places in each number? The default is 4.
-#' @param ... additional arguments
-#' @describeIn GDINA extract various item parameters
-#' @aliases itemparm.GDINA
-#' @export
+#' @rdname itemparm
 itemparm.GDINA <- function(object,
-                           what = c("catprob","itemprob","LCprob","gs","delta","rrum"),
+                           what = c("catprob","gs","delta","rrum","itemprob","LCprob"),
                            withSE = FALSE, SE.type = 2,digits = 4, ...){
   if(!class(object)=="GDINA") stop("object must be a GDINA estimate.",call. = FALSE)
+  .Deprecated("coef", package="GDINA",msg = "'itemparm' is deprecated - use 'coef' instead.")
   what <- match.arg(what)
   if(tolower(what)=="catprob"){
     if(withSE){

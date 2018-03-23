@@ -4,33 +4,30 @@
 \alias{attributepattern}
 \title{Generate all possible attribute patterns}
 \usage{
-attributepattern(K, poly = F, Q = NULL)
+attributepattern(K, Q)
 }
 \arguments{
 \item{K}{number of attributes}
 
-\item{poly}{logical; is Q matrix polytomous?}
-
 \item{Q}{Q-matrix; required when Q-matrix is polytomous}
 }
 \value{
-attribute profiles for \eqn{2^K} latent classes
+A \eqn{2^K\times K} matrix consisting of attribute profiles for \eqn{2^K} latent classes
 }
 \description{
-This function generates all possible attribute patterns.
-The Q-matrix is needed when any attributes are polytomous.
+This function generates all possible attribute patterns. The Q-matrix needs to be specified for polytomous attributes.
 }
 \examples{
 attributepattern(3)
 
 q <- matrix(scan(text = "0 1 2 1 0 1 1 2 0"),ncol = 3)
 q
-attributepattern(ncol(q),poly=TRUE,q)
+attributepattern(Q=q)
 
 q <- matrix(scan(text = "0 1 1 1 0 1 1 1 0"),ncol = 3)
 q
-attributepattern(ncol(q),poly=TRUE,q)
+attributepattern(K=ncol(q),Q=q)
 }
 \author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }

@@ -2,7 +2,6 @@
 #'
 #' Calculate item fit statistics (Chen, de la Torre, & Zhang, 2013)
 #'
-#'
 #' @param GDINA.obj An estimated model object of class \code{GDINA}
 #' @param person.sim Simulate expected responses from the posterior or based on EAP, MAP and MLE estimates.
 #' @param p.adjust.methods p-values for the proportion correct, transformed correlation, and log-odds ratio
@@ -22,8 +21,7 @@
 #' \item{maxitemfit}{the maximum proportion correct, transformed correlation, and log-odds ratio for each item with associated item-level adjusted p-values}
 #' }
 #'
-#' @author {Wenchao Ma, Rutgers University, \email{wenchao.ma@@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
-#'
+#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 #' @export
 #' @references
 #' Chen, J., de la Torre, J., & Zhang, Z. (2013). Relative and Absolute Fit Evaluation in Cognitive Diagnosis Modeling.
@@ -33,7 +31,7 @@
 #' \dontrun{
 #' dat <- sim10GDINA$simdat
 #' Q <- sim10GDINA$simQ
-#' # --- GDINA model ---#
+#'
 #' mod1 <- GDINA(dat = dat, Q = Q, model = "GDINA")
 #' mod1
 #' itmfit <- itemfit(mod1)
@@ -94,7 +92,7 @@ itemfit <- function(GDINA.obj,person.sim = "post",p.adjust.methods = "bonferroni
     Nfit <- N.resampling
   }
   Rep <- ceiling(Nfit / N)
-  pattern <- t(alpha(K, T, Q))
+  pattern <- t(attributepattern(Q = Q))
 
   if (person.sim == "post") {
     post <- extract(GDINA.obj, "posterior.prob")
@@ -123,26 +121,12 @@ itemfit <- function(GDINA.obj,person.sim = "post",p.adjust.methods = "bonferroni
 
      fitstat <- list()
 
-    # if(!extract(GDINA.obj, "sequential")) {
-      Yfit <- Pr[att_group, ] > matrix(runif(length(att_group) * J), ncol = J)
-    # } else{
-    #   Yfit <- matrix(0,length(att_group),J)
-    #   dichitems <- unique_only(Qc$Item)
-    #   if(length(dichitems)>0){
-    #     Yfit[,dichitems] <- Pr[att_group, dichitems]> matrix(runif(length(att_group) * length(dichitems)), ncol = length(dichitems))
-    #   }
-    #   polyitems <- setdiff(unique(Qc$Item),dichitems)
-    #   for(j in polyitems){
-    #     Yfit[,j] <- apply(cbind(1-rowSums(Pr[att_group, which(Qc$Item==j)]),Pr[att_group, which(Qc$Item==j)]),
-    #                       1,function(x){sample(c(0:length(x)),1,prob=x)})
-    #   }
-    # }
-     fitstat$r <- cor(dat, use = "pairwise.complete.obs")
+    Yfit <- Pr[att_group, ] > matrix(runif(length(att_group) * J), ncol = J)
+    fitstat$r <- cor(dat, use = "pairwise.complete.obs")
      fitstat$rfit <- cor(Yfit)
     fitstat$l <- crossprod.na(dat,dat)*crossprod.na(1-dat,1-dat)/(crossprod.na(1-dat,dat)*crossprod.na(dat,1-dat))
     fitstat$lfit <- crossprod.na(Yfit,Yfit)*crossprod.na(1-Yfit,1-Yfit)/(crossprod.na(1-Yfit,Yfit)*crossprod.na(Yfit,1-Yfit))
-    fitstat$sefit <- Rep*(1/crossprod.na(Yfit,Yfit) + 1/crossprod.na(1-Yfit,1-Yfit) +
-                    1/crossprod.na(1-Yfit,Yfit)+1/crossprod.na(Yfit,1-Yfit))
+    fitstat$sefit <- Rep*(1/crossprod.na(Yfit,Yfit) + 1/crossprod.na(1-Yfit,1-Yfit) + 1/crossprod.na(1-Yfit,Yfit)+1/crossprod.na(Yfit,1-Yfit))
     fitstat$pfit <- colMeans(Yfit)
    }else{
      fitstat <- fitstats(dat,as.matrix(Pr),att_group)

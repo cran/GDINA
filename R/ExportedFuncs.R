@@ -1,28 +1,42 @@
 #' Generate all possible attribute patterns
 #'
-#' This function generates all possible attribute patterns.
-#' The Q-matrix is needed when any attributes are polytomous.
+#' This function generates all possible attribute patterns. The Q-matrix needs to be specified for polytomous attributes.
 #'
 #' @param K number of attributes
-#' @param poly logical; is Q matrix polytomous?
 #' @param Q Q-matrix; required when Q-matrix is polytomous
 #'
-#' @return attribute profiles for \eqn{2^K} latent classes
-#' @author {Wenchao Ma, Rutgers University, \email{wenchao.ma@@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+#' @return A \eqn{2^K\times K} matrix consisting of attribute profiles for \eqn{2^K} latent classes
+#'
+#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 #' @export
 #' @examples
 #' attributepattern(3)
 #'
 #' q <- matrix(scan(text = "0 1 2 1 0 1 1 2 0"),ncol = 3)
 #' q
-#' attributepattern(ncol(q),poly=TRUE,q)
+#' attributepattern(Q=q)
 #'
 #' q <- matrix(scan(text = "0 1 1 1 0 1 1 1 0"),ncol = 3)
 #' q
-#' attributepattern(ncol(q),poly=TRUE,q)
+#' attributepattern(K=ncol(q),Q=q)
 
-attributepattern <-  function(K,poly=F,Q=NULL){
-  return(alpha(K,poly,Q))
+attributepattern <-  function(K,Q){
+  if(missing(K)){
+    if(!missing(Q)){
+      K <- ncol(Q)
+    }else{
+      stop("The number of attribute or Q-matrix is needed.",call. = FALSE)
+    }
+  }
+  if (missing(Q)){
+    alpha <- alpha2(K)
+  }else if(max(Q)==1){
+    alpha <- alpha2(K)
+  }else{
+    alpha <- alphap(apply(Q,2,max))
+  }
+  colnames(alpha) <- paste("A",1:K,sep = "")
+  return(alpha)
 }
 
 
@@ -42,7 +56,7 @@ attributepattern <-  function(K,poly=F,Q=NULL){
 #'    be combined into \eqn{2^{Kj}} latent groups. This matrix gives
 #'    which latent group each of \eqn{2^K} latent classes belongs to for each item.
 #'
-#' @author {Wenchao Ma, Rutgers University, \email{wenchao.ma@@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 #' @export
 #' @examples
 #' attributepattern(3)
@@ -54,7 +68,7 @@ attributepattern <-  function(K,poly=F,Q=NULL){
 
 LC2LG <-  function(Q,sequential = FALSE){
   if(sequential) Q <- Q[,-c(1:2)]
-  out <- eta.loc(Q)
+  out <- eta(Q)
   colnames(out) <- apply(attributepattern(ncol(Q)),1,function(x)paste0(x,collapse = ""))
   rownames(out) <- rownames(Q)
   out
@@ -125,28 +139,6 @@ cjoint <- function(...,fill = NA){
 
 }
 
-#' Count and label unique rows in a data frame
-#'
-#' @param df a data frame or matrix
-#'
-#' @return freq the number of rows
-#' @return group the data frame with a column named row.no giving unique labels for all unique rows
-#' @export
-#' @import data.table
-#' @examples
-#'
-#' df <- data.frame(V1=c(1L,2L),V2=LETTERS[1:3],V3=rep(1,12))
-#' rowCount(df)
-#'
-#'
-#'
-rowCount <- function(df){
-  DT <- data.table(df)
-  varb <- colnames(DT)
-  freq <- DT[,.N,by=c(varb)]
-  DT$gr <- as.numeric(factor(apply(DT,1,paste0,collapse="")))
-  return(list(freq=data.frame(freq),group=data.frame(DT)))
-}
 
 #' Count the frequency of a row vector in a data frame
 #'
@@ -218,6 +210,7 @@ unrestrQ <- function(Qc){
 #' Score function
 #'
 #' Calculate score function for each dichotomous item or each nonzero category for polytomous items
+#' Only applicable to saturated model ofr joint attribute distribution
 #'
 #' @param object an object of class GDINA
 #' @param parm Either \code{delta} or \code{prob} indicating score function for delta parameters and
@@ -225,7 +218,13 @@ unrestrQ <- function(Qc){
 #' @return a list where elements give the score functions for each item or category
 #' @export
 #'
-#'
+#' @examples
+#'\dontrun{
+#' dat <- sim10GDINA$simdat
+#' Q <- sim10GDINA$simQ
+#' fit <- GDINA(dat = dat, Q = Q, model = "GDINA")
+#' score(fit)
+#' }
 #'
 #'
 score <- function(object,parm="delta"){
@@ -235,4 +234,122 @@ score <- function(object,parm="delta"){
     if(any(extract(object,"models_numeric")>2)) stop("Score functions of success probabilities cannot be calculated for ACDM, LLM and RRUM.",call. = FALSE)
     score_p(object)
   }
+}
+
+#' Functions for internal use
+#'
+#' @param ... arguments passed to internal functions
+#' @name internal_GDINA
+NULL
+
+
+#' @name internal_Lik
+#' @export
+#' @rdname internal_GDINA
+internal_Lik <- function(...){
+args <- list(...)
+stopifnot(length(args)>0)
+if(is.null(args$group)) args$group <- rep(1,nrow(args$dat))
+if(is.null(args$weights)) args$weights <- rep(1,nrow(args$dat))
+if(is.null(args$simplify)) args$simplify <- 0
+LikNR(mpar = args$catprob.parm,
+      mX = args$dat,
+      vlogPrior = args$logprior,
+      vgroup = args$group,
+      mloc = args$eta,
+      weights = args$weights,
+      simplify = args$simplify)
+}
+#' @name internal_Lik2
+#' @export
+#' @rdname internal_GDINA
+internal_Lik2 <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  if(is.null(args$group)) args$group <- rep(1,nrow(args$dat))
+  if(is.null(args$weights)) args$weights <- rep(1,nrow(args$dat))
+  if(is.null(args$simplify)) args$simplify <- 0
+  LikNR_LC(mP = args$LCprob,
+        mX = args$dat,
+        vlogPrior = args$logprior,
+        vgroup = args$group,
+        weights = args$weights,
+        simplify = args$simplify)
+}
+#' @name internal_aggregateCol
+#' @export
+#' @rdname internal_GDINA
+internal_aggregateCol <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  aggregateCol(mX=args$x,
+               ind = args$by)
+}
+
+#' @name internal_eta
+#' @export
+#' @rdname internal_GDINA
+internal_eta <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  eta(Q=args$Q)
+}
+
+#' @name internal_matchMatrix
+#' @export
+#' @rdname internal_GDINA
+internal_matchMatrix <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  matchMatrix(A=args$A,B=args$B)
+}
+
+#' @name internal_RowNormalize
+#' @export
+#' @rdname internal_GDINA
+internal_RowNormalize <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  RowNormalize(args$x)
+}
+
+#' @name internal_ColNormalize
+#' @export
+#' @rdname internal_GDINA
+internal_ColNormalize <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  ColNormalize(args$x)
+}
+
+#' @name internal_RowProd
+#' @export
+#' @rdname internal_GDINA
+internal_RowProd <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  rowProd(args$x,args$v)
+}
+
+#' @name internal_l2m
+#' @export
+#' @rdname internal_GDINA
+internal_l2m <- function(...){
+  l2m(...)
+}
+
+#' @name internal_l2m
+#' @export
+#' @rdname internal_GDINA
+internal_m2l <- function(...){
+  m2l(...)
+}
+
+#' @name internal_uP
+#' @export
+#' @rdname internal_GDINA
+internal_uP <- function(...){
+  args <- list(...)
+  stopifnot(length(args)>0)
+  uP(mloc = args$eta, mpar = args$catprob.parm)
 }

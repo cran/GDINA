@@ -2,37 +2,33 @@
 % Please edit documentation in R/designmatrix.R
 \name{designmatrix}
 \alias{designmatrix}
-\title{Design matrix for parameter transformation}
+\title{Generate design matrix}
 \usage{
-designmatrix(Kj, model = "GDINA")
+designmatrix(Kj, model = "GDINA", Qj = NULL)
 }
 \arguments{
-\item{Kj}{the number of attributes for item j}
+\item{Kj}{Required except for the MS-DINA model; The number of attributes required for item j}
 
-\item{model}{the model fitted to item j; it can be "GDINA","DINA","DINO","ACDM","LLM",or "RRUM".
-The default is "GDINA".}
+\item{model}{the model associated with the design matrix; It can be "GDINA","DINA","DINO", "ACDM" or "MSDINA".
+The default is "GDINA". Note that models "LLM" and "RRUM" have the same design matrix as the ACDM.}
+
+\item{Qj}{the Q-matrix for item j; This is required for "MSDINA" model; The number of rows is equal to the number
+of strategies and the number of columns is equal to the number of attributes.}
 }
 \value{
-a design matrix (Mj) which plays a critical role of transforming probability of success with
-        delta parameters. See de la Torre (2011) for details.
+a design matrix (Mj). See de la Torre (2011) for details.
 }
 \description{
-This function calculates the design matrix \eqn{M_j} in de la Torre (2011),
-which can be useful for parameter transformation between probability of success and
-delta.
+This function generates the design matrix for an item
 }
 \examples{
-
-# transform probability of success to delta
-# based on saturated GDINA model
-# assuming an item with 2 attributes has the following
-# probability of success for 00, 10, 01 and 11
-pj <- c(0.2,0.4,0.6,0.8)
-Mj <- designmatrix(2)
-# delta parameters can be calculated in this way:
-deltaj <- solve(Mj)\%*\%pj
-# for reduced CDMs, OLS or WLS may be used
-
+\dontrun{
+designmatrix(Kj = 2, model = "GDINA")
+designmatrix(Kj = 3, model = "DINA")
+msQj <- matrix(c(1,0,0,1,
+                 1,1,0,0),nrow=2,byrow=TRUE)
+designmatrix(model = "MSDINA",Qj = msQj)
+}
 
 }
 \references{

@@ -5,10 +5,10 @@
 \alias{summary.autoGDINA}
 \title{Q-matrix validation, model selection and calibration in one run}
 \usage{
-autoGDINA(dat, Q, modelselection = TRUE, Qvalid = TRUE,
-  reducedCDM = c("DINA", "DINO", "ACDM", "LLM", "RRUM"), alpha.level = 0.05,
-  modelselectionrule = "simpler", eps = 0.95, GDINA1.option = list(),
-  GDINA2.option = list(), CDM.option = list())
+autoGDINA(dat, Q, modelselection = TRUE, modelselectionrule = "simpler",
+  alpha.level = 0.05, modelselection.args = list(), Qvalid = TRUE,
+  Qvalid.args = list(), GDINA1.args = list(), GDINA2.args = list(),
+  CDM.args = list())
 
 \method{summary}{autoGDINA}(object, ...)
 }
@@ -16,37 +16,36 @@ autoGDINA(dat, Q, modelselection = TRUE, Qvalid = TRUE,
 \item{dat}{A required \eqn{N \times J} \code{matrix} or \code{data.frame} consisting of the
 responses of \eqn{N} individuals to \eqn{J} items. Missing values need to be coded as \code{NA}.}
 
-\item{Q}{A required \eqn{J \times K} item or category and attribute association matrix, wher \eqn{J} represents the number of
-items or nonzero categories and \eqn{K} represents the number of attributes. For binary attributes,
-entry 1 indicates that the attribute is measured by the item, and 0 otherwise.
-For polytomous attributes, non-zero elements indicate the level
-of attributes that are needed for an individual to answer the item correctly (see Chen, & de la Torre, 2013).
-Note that for polytomous items, the sequential G-DINA
-model is used and either restricted or unrestricted category-level Q-matrix is needed.
-In the category-level Q-matrix, the first column gives the item number, which must be numeric and match the number of column in the data.
-The second column indicates the category number. See \code{Examples}.}
+\item{Q}{A required matrix; The number of rows occupied by a single-strategy dichotomous item is 1, by a polytomous item is
+the number of nonzero categories, and by a mutiple-strategy dichotomous item is the number of strategies.
+The number of column is equal to the number of attributes if all items are single-strategy dichotomous items, but
+the number of attributes + 2 if any items are polytomous or have multiple strategies.
+For a polytomous item, the first column represents the item number and the second column indicates the nonzero category number.
+For a multiple-strategy dichotomous item, the first column represents the item number and the second column indicates the strategy number.
+For binary attributes, 1 denotes the attributes are measured by the items and 0 means the attributes are not
+   measured. For polytomous attributes, non-zero elements indicate which level
+   of attributes are needed (see Chen, & de la Torre, 2013).  See \code{Examples}.}
 
 \item{modelselection}{logical; conducting model selection or not?}
-
-\item{Qvalid}{logical; validate Q-matrix or not? \code{TRUE} is the default.}
-
-\item{reducedCDM}{a vector specifying which reduced CDMs are possible reduced CDMs for each
-item. The default is "DINA","DINO","ACDM","LLM",and "RRUM".}
-
-\item{alpha.level}{nominal level for the Wald test. The default is 0.05.}
 
 \item{modelselectionrule}{how to conducted model selection? Possible options include
 \code{simpler}, \code{largestp} and \code{DS}. See \code{Details}.}
 
-\item{eps}{cut-off value for PVAF if \code{Qvalid=TRUE}. The default is 0.95.}
+\item{alpha.level}{nominal level for the Wald test. The default is 0.05.}
 
-\item{GDINA1.option}{options for initial G-DINA calibration}
+\item{modelselection.args}{arguments passed to \code{modelcomp}}
 
-\item{GDINA2.option}{options for second G-DINA calibration}
+\item{Qvalid}{logical; validate Q-matrix or not? \code{TRUE} is the default.}
 
-\item{CDM.option}{options for final calibration}
+\item{Qvalid.args}{arguments passed to \code{Qval}}
 
-\item{object}{estimated GDINA object for various S3 methods}
+\item{GDINA1.args}{arguments passed to GDINA function for initial G-DINA calibration}
+
+\item{GDINA2.args}{arguments passed to GDINA function for the second G-DINA calibration}
+
+\item{CDM.args}{arguments passed to GDINA function for final calibration}
+
+\item{object}{GDINA object for various S3 methods}
 
 \item{...}{additional arguments}
 }
@@ -78,7 +77,7 @@ If all reduced models were rejected for an item, the G-DINA model was used as th
 if at least one reduced model was retained, three diferent rules can be implemented for selecting
 the best model:
 
-when \code{modelselectionrule} is \code{simpler}:
+When \code{modelselectionrule} is \code{simpler}:
 
  If (a) the DINA or DINO model
  was one of the retained models, then the DINA or DINO model with the larger p
@@ -96,7 +95,7 @@ when \code{modelselectionrule} is \code{simpler}:
 
  The reduced model with non-significant p-values but the smallest dissimilarity index is selected as the most appropriate model.
  Dissimilarity index can be viewed as an effect size measure, which quatifies how dis-similar the reduced model is from the
- G-DINA model. See Ma, Iaconangelo, and de la Torre (2016).
+ G-DINA model (See Ma, Iaconangelo, and de la Torre, 2016 for details).
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -125,7 +124,8 @@ AIC(out1$CDM.obj)
 
 
 #using the other selection rule
-out11 <- autoGDINA(dat,misQ,modelselectionrule="simpler",reducedCDM = c("DINO","DINA"))
+out11 <- autoGDINA(dat,misQ,modelselectionrule="simpler",
+                   modelselection.args = list(models = c("DINO","DINA")))
 out11
 summary(out11)
 
@@ -134,11 +134,9 @@ out12 <- autoGDINA(dat,misQ,modelselection=FALSE)
 out12
 summary(out12)
 
-# -- Only consider some reduced CDMs
-out2 <- autoGDINA(dat,misQ,reducedCDM = c("RRUM","LLM"))
 
 # Disable Q-matrix validation
-out3 <- autoGDINA(dat = dat, Q = misQ, Qvalid = FALSE,alpha.level=0.01)
+out3 <- autoGDINA(dat = dat, Q = misQ, Qvalid = FALSE)
 out3
 summary(out3)
 }
@@ -151,5 +149,5 @@ Ma, W., Iaconangelo, C., & de la Torre, J. (2016). Model similarity, model selec
 \code{\link{GDINA}}, \code{\link{modelcomp}}, \code{\link{Qval}}
 }
 \author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }

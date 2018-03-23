@@ -17,3 +17,6 @@ startGDINA()
 }
 
 }
+\author{
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+}

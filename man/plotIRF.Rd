@@ -11,7 +11,7 @@ plotIRF(object, item, errorbar = FALSE, ...)
 
 \item{item}{a vector specifying which item(s) the plots are drawn for}
 
-\item{errorbar}{add error bar to the plot?}
+\item{errorbar}{add error bar (estimate - SE, estimate + SE) to the plot?}
 
 \item{...}{additional arguments}
 }
@@ -25,7 +25,7 @@ Q <- sim10GDINA$simQ
 mod1 <- GDINA(dat = dat, Q = Q, model = "GDINA")
 #plot item response functions for item 10
 plotIRF(mod1,10)
-plotIRF(mod1,9, errorbar = TRUE)
+plotIRF(mod1,10, errorbar = TRUE)
 }
 }
 \seealso{

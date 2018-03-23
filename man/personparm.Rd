@@ -2,16 +2,18 @@
 % Please edit documentation in R/personparm.GDINA.R
 \name{personparm}
 \alias{personparm}
-\title{calculate lower-order incidental (person) parameters}
+\title{calculate person (incidental) parameters}
 \usage{
-personparm(object, what = c("EAP", "MAP", "MLE", "mp"), digits = 4, ...)
+personparm(object, what = c("EAP", "MAP", "MLE", "mp", "HO"), digits = 4,
+  ...)
 }
 \arguments{
 \item{object}{estimated GDINA object returned from \code{\link{GDINA}}}
 
 \item{what}{what to extract; It can be \code{"EAP"},
 \code{"MAP"}, and \code{"MLE"}, for EAP, MAP and MLE estimates of
-attribute patterns, and \code{"mp"} for marginal mastery probabilities.}
+attribute patterns, and \code{"mp"} for marginal mastery probabilities, and \code{"HO"}
+for higher-order ability estimates if a higher-order model is fitted.}
 
 \item{digits}{number of decimal places.}
 
@@ -20,13 +22,25 @@ attribute patterns, and \code{"mp"} for marginal mastery probabilities.}
 \description{
 Function to calculate various person attribute parameters, including \code{"EAP"},
 \code{"MAP"}, and \code{"MLE"}, for EAP, MAP and MLE estimates of
-attribute patterns, \code{"mp"} for marginal mastery probabilities.
-See \code{\link{GDINA}} for examples. To estimate higher-order person parameters,
-see \code{\link{hoparm}}.
+attribute patterns (see Huebner & Wang, 2011), \code{"mp"} for marginal mastery probabilities, and \code{"HO"}
+for higher-order ability estimates if a higher-order model is fitted.
+See \code{\link{GDINA}} for examples.
+}
+\examples{
+\dontrun{
+dat <- sim10GDINA$simdat
+Q <- sim10GDINA$simQ
+fit <- GDINA(dat = dat, Q = Q, model = "GDINA")
+# EAP
+head(personparm(fit))
+# MAP
+head(personparm(fit, what = "MAP"))
+}
+
 }
 \references{
 Huebner, A., & Wang, C. (2011). A note on comparing examinee classification methods for cognitive diagnosis models. \emph{Educational and Psychological Measurement, 71}, 407-419.
 }
 \author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }

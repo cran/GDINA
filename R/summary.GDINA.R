@@ -15,9 +15,10 @@ summary.GDINA <-
     "BIC penalty due to item parameters"=log(extract(object,"nobs"))*extract(object,"npar.item"),
     "BIC penalty due to population parameters"=log(extract(object,"nobs"))*extract(object,"npar.att"),
     "Attribute Prevalence"=extract(object,"prevalence"),
-    "Posterior Weights"=extract(object,"posterior.prob"),
-    "ngroup"=extract(object,"ngroup"))
-
+    "ngroup"=extract(object,"ngroup"),
+    "Number of parameters"=extract.GDINA(object,"npar"),
+    "Number of item parameters"=extract.GDINA(object,"npar.item"),
+    "Number of population parameters"=extract.GDINA(object,"npar.att"))
     class(output) <- "summary.GDINA"
     output
   }
@@ -66,8 +67,8 @@ output <- list(fit=fit,Qval=object$Qval.obj,finalmodel=object$CDM.obj)
    function(object, ...)
    {
      cat("\nItem success probabilities for two groups\n")
-     out <- mapply(rbind,extract.GDINA(object$CDM1,what = "itemprob.parm"),
-                   extract.GDINA(object$CDM2,what = "itemprob.parm"),SIMPLIFY = F)
+     out <- mapply(rbind,extract(object$CDM1,what = "catprob.parm"),
+                   extract(object$CDM2,what = "catprob.parm"),SIMPLIFY = F)
      out <- lapply(out,function(x){rownames(x) <- c("Group1.Est.","Group2.Est.");x})
      print(out)
      invisible(out)
@@ -85,16 +86,17 @@ output <- list(fit=fit,Qval=object$Qval.obj,finalmodel=object$CDM.obj)
 
    }
 
+
  #' @export
  #' @describeIn modelcomp print summary information
  summary.modelcomp <-
    function(object, ...)
    {
      cat("\nItem-level model comparison:\n")
-     cat("Wald statistics for items requiring two or more attributes:\n")
-     wald <- extract.modelcomp(object,"wald")
+     cat("Test statistics for items requiring two or more attributes:\n")
+     wald <- extract.modelcomp(object,"stats")
      print(wald[,colSums(is.na(wald))==0])
-     cat("\nWald test p-values for items requiring two or more attributes:\n")
-     p <- extract.modelcomp(object,"wald.p")
+     cat("\np-values for items requiring two or more attributes:\n")
+     p <- extract.modelcomp(object,"pvalues")
      print(p[,colSums(is.na(p))==0])
    }

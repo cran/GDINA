@@ -73,5 +73,5 @@ att.structure(unstru,K)
 \code{\link{GDINA}}, \code{\link{autoGDINA}}
 }
 \author{
-{Wenchao Ma, Rutgers University, \email{wenchao.ma@rutgers.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
 }

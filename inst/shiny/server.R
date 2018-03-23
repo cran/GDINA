@@ -16,8 +16,8 @@ shinyServer(function(input, output) {
     inFile <- input$file2
     if (is.null(inFile))
       return(NULL)
-    y <- read.csv(inFile$datapath, header = input$header,
-             sep = input$sep, quote = input$quote)
+    y <- read.csv(inFile$datapath, header = input$header2,
+             sep = input$sep2, quote = input$quote)
     head(y)
   })
 
@@ -33,8 +33,8 @@ shinyServer(function(input, output) {
              sep = input$sep, quote = input$quote)
 
     inFile2 <- input$file2
-    Q <- read.csv(inFile2$datapath, header = input$header,
-                    sep = input$sep, quote = input$quote)
+    Q <- read.csv(inFile2$datapath, header = input$header2,
+                    sep = input$sep2, quote = input$quote)
     if(input$attdis==0){
       HOdist <- "saturated"
     }else if(input$attdis==1){
@@ -42,25 +42,13 @@ shinyServer(function(input, output) {
     }else if(input$attdis==2){
       HOdist <- "fixed"
     }
-    if(input$type=="autoSelected"){
-      fit <- GDINA::autoGDINA(dat = dat, Q = Q, Qvalid = FALSE,
-                              alpha.level = input$alphalevel, modelselectionrule = input$waldmethod,
-                              GDINA1.option = list(verbose = 0,att.dist = HOdist,
-                          higher.order = list(model = input$hom),
-                          sequential = input$seq,
-                          mono.constraint = input$mono),
-                          CDM.option = list(verbose = 0,att.dist = HOdist,
-                                            higher.order = list(model = input$hom),
-                                                                             sequential = input$seq,
-                                                                             mono.constraint = input$mono))
-      est <- fit$CDM.obj
-    }else{
+
       est <- GDINA::GDINA(dat = dat, Q = Q, model = input$type,
                           verbose = 0,att.dist = HOdist,
                           higher.order = list(model = input$hom),
                           sequential = input$seq,
                           mono.constraint = input$mono)
-    }
+
 
     est
   }))
@@ -103,6 +91,8 @@ shinyServer(function(input, output) {
   })
 
 
+
+
   output$info <- renderPrint({
     if (input$goButton == 0)
       return()
@@ -119,20 +109,60 @@ shinyServer(function(input, output) {
   itf <- reactive({
     itemfit(est.result())
   })
+
   output$itfit <- renderPrint({
     print(itf())
   })
 
 
+
+  output$heatplot1 <- reactivePlot(function(){
+    if (input$goButton == 0)
+      return()
+    item.pair.1 <- item.pair.2 <- unadj.pvalue <- test.adj.pvalue <- NULL
+    if(input$heatmap.type=="log odds ratio"){
+      df <- extract(itf(),"logOR")
+    }else{
+      df <- extract(itf(),"r")
+    }
+
+    if(input$heatmap.adjust){
+      p <- ggplot(df, aes(x=factor(item.pair.2),
+                          y=factor(item.pair.1),
+                          fill=test.adj.pvalue))+
+        geom_tile()+ scale_fill_gradient(low="red",
+                                         high="gray",
+                                         limits=c(0,0.05))+
+        theme_bw() +
+        labs(x = "Items", y = "Items",
+             title = paste("Heatmap plot for adjusted p-values of ",input$heatmap.type))
+    }else{
+      p <- ggplot(df, aes(x=factor(item.pair.2),
+                          y=factor(item.pair.1),
+                          fill=unadj.pvalue))+
+        geom_tile()+ scale_fill_gradient(low="red",
+                                         high="gray",
+                                         limits=c(0,0.05))+
+        theme_bw() +
+        labs(x = "Items", y = "Items",
+             title = paste("Heatmap plot for unadjusted p-values of ",input$heatmap.type))
+    }
+
+
+    print(p)
+  })
+
+
+
   ip <- reactive({
     if (input$goButton == 0) return()
-    itemparm(est.result(),what = input$ips,withSE=TRUE)
+    coef(est.result(),what = input$ips,withSE=TRUE)
   })
 
   output$ip <- renderPrint({
     if (input$goButton == 0)
       return()
-    itemparm(est.result(),what = input$ips,withSE=TRUE)
+    coef(est.result(),what = input$ips,withSE=TRUE)
   })
 
   output$pparm <- renderPrint({
@@ -146,6 +176,20 @@ shinyServer(function(input, output) {
   output$sugQ <- renderPrint({
     if (input$qvalcheck == 0)  return()
     extract(q(),what = "sug.Q")
+  })
+
+  m <- reactive({
+    if (input$modelsel == 0)  return()
+    modelcomp(est.result())
+  })
+
+  output$ws <- renderPrint({
+    if (input$modelsel == 0)  return()
+    extract(m(),what = "stats")
+  })
+  output$pv <- renderPrint({
+    if (input$modelsel == 0)  return()
+    extract(m(),what = "pvalues")
   })
 
 makeIRFplot <- function(){
