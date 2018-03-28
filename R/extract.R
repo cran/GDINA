@@ -223,10 +223,10 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                   }else{
                     dat <- extract(object,"dat")
                   }
-                  out <- NgRg(mlogPost = object$technicals$logposterior.i,
-                              mX = dat,
-                              mloc = eta(matrix(1,extract(object,"ncat"),extract(object,"natt"))),
-                              weights = rep(1,nrow(dat)))$Rg
+                  out <- NgRg(object$technicals$logposterior.i,
+                              dat,
+                              eta(matrix(1,extract(object,"ncat"),extract(object,"natt"))),
+                              rep(1,nrow(dat)))$Rg
                   row.names(out) <- object$options$item.names
                   out
                 },
@@ -236,10 +236,10 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                   }else{
                     dat <- extract(object,"dat")
                   }
-                  out <- NgRg(mlogPost = object$technicals$logposterior.i,
-                              mX = dat,
-                              mloc = eta(matrix(1,extract(object,"ncat"),extract(object,"natt"))),
-                              weights = rep(1,nrow(dat)))$Ng
+                  out <- NgRg(object$technicals$logposterior.i,
+                              dat,
+                              eta(matrix(1,extract(object,"ncat"),extract(object,"natt"))),
+                              rep(1,nrow(dat)))$Ng
                   row.names(out) <- object$options$item.names
                   out
                 },
@@ -286,6 +286,7 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                 item.names = object$options$item.names,
                 itemprob.history = object$diagnos$itemprob.matrix,
                 Kj = {rowSums(extract(object,"Q"))},
+                latent.var = object$options$latent.var,
                 LCprob.parm = object$LC.prob,
                 LCpf.parm = {
                   LCpf <- patt <- eta(as.matrix(extract(object,"Q")))

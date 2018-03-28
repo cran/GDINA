@@ -252,13 +252,13 @@ stopifnot(length(args)>0)
 if(is.null(args$group)) args$group <- rep(1,nrow(args$dat))
 if(is.null(args$weights)) args$weights <- rep(1,nrow(args$dat))
 if(is.null(args$simplify)) args$simplify <- 0
-LikNR(mpar = args$catprob.parm,
-      mX = args$dat,
-      vlogPrior = args$logprior,
-      vgroup = args$group,
-      mloc = args$eta,
-      weights = args$weights,
-      simplify = args$simplify)
+LikNR(args$catprob.parm,
+      args$dat,
+      args$logprior,
+      args$group,
+      args$eta,
+      args$weights,
+      args$simplify)
 }
 #' @name internal_Lik2
 #' @export
@@ -269,12 +269,12 @@ internal_Lik2 <- function(...){
   if(is.null(args$group)) args$group <- rep(1,nrow(args$dat))
   if(is.null(args$weights)) args$weights <- rep(1,nrow(args$dat))
   if(is.null(args$simplify)) args$simplify <- 0
-  LikNR_LC(mP = args$LCprob,
-        mX = args$dat,
-        vlogPrior = args$logprior,
-        vgroup = args$group,
-        weights = args$weights,
-        simplify = args$simplify)
+  LikNR_LC(args$LCprob,
+        args$dat,
+        args$logprior,
+        args$group,
+        args$weights,
+        args$simplify)
 }
 #' @name internal_aggregateCol
 #' @export
@@ -282,8 +282,8 @@ internal_Lik2 <- function(...){
 internal_aggregateCol <- function(...){
   args <- list(...)
   stopifnot(length(args)>0)
-  aggregateCol(mX=args$x,
-               ind = args$by)
+  aggregateCol(args$x,
+               args$by)
 }
 
 #' @name internal_eta
@@ -292,7 +292,7 @@ internal_aggregateCol <- function(...){
 internal_eta <- function(...){
   args <- list(...)
   stopifnot(length(args)>0)
-  eta(Q=args$Q)
+  eta(args$Q)
 }
 
 #' @name internal_matchMatrix
@@ -301,7 +301,7 @@ internal_eta <- function(...){
 internal_matchMatrix <- function(...){
   args <- list(...)
   stopifnot(length(args)>0)
-  matchMatrix(A=args$A,B=args$B)
+  matchMatrix(args$A,args$B)
 }
 
 #' @name internal_RowNormalize
@@ -351,5 +351,5 @@ internal_m2l <- function(...){
 internal_uP <- function(...){
   args <- list(...)
   stopifnot(length(args)>0)
-  uP(mloc = args$eta, mpar = args$catprob.parm)
+  uP(args$eta, args$catprob.parm)
 }

@@ -34,6 +34,7 @@ itemparm <- function(object,
 
 
 #' @rdname itemparm
+#' @export
 itemparm.GDINA <- function(object,
                            what = c("catprob","gs","delta","rrum","itemprob","LCprob"),
                            withSE = FALSE, SE.type = 2,digits = 4, ...){
