@@ -1,35 +1,44 @@
 #' @include GDINA.R
 
-#'@export
-#'@describeIn GDINA calculate AIC
-AIC.GDINA <- function(object,...){
-  aic <- extract(object, what = "AIC")
-  class(aic) <- "AIC.GDINA"
-  aic
-}
-
-#' @export
-#' @describeIn GDINA calculate BIC
-BIC.GDINA <- function(object,...){
-  bic <- extract(object, what = "BIC")
-  class(bic) <- "BIC.GDINA"
-  bic
-}
 
 #' @export
 #' @describeIn GDINA calculate log-likelihood
-logLik.GDINA <- function(object,...){
+logLik.GDINA <- function (object, ...){
+
   logL <- extract(object, what = "logLik")
-  class(logL) <- "logLik.GDINA"
-  logL
+
+  attr(logL, "df") <- extract(object, what = "npar")
+
+  attr(logL, "nobs") <- extract(object, what = "nobs")
+
+  class(logL) <- "logLik"
+
+  return(logL)
+
 }
+
 #' @export
 #' @describeIn GDINA calculate deviance
 deviance.GDINA <- function(object,...){
-  dev <- extract(object, what = "deviance")
-  class(dev) <- "deviance.GDINA"
-  dev
+  extract(object, what = "deviance")
 }
+#' @export
+#' @describeIn GDINA calculate number of observations
+nobs.GDINA <- function(object,...){
+  extract(object, what = "nobs")
+}
+
+#' @export
+#' @describeIn GDINA calculate covariance-matrix for delta parameters
+vcov.GDINA <- function(object,...){
+  dn <- lapply(coef(object,"delta"),names)
+  nm <- names(dn)
+  v.names <- NULL
+  for(j in seq_len(length(dn))) v.names <- c(v.names,paste(nm[j],dn[[j]]))
+  opg <- OPG_d(object,SE.type = 2)$cov
+  rownames(opg) <- colnames(opg) <- v.names
+  opg
+  }
 
 #' @title Calculate the number of parameters
 #' @description Calculate the number of parameters for GDINA estimates.
@@ -108,3 +117,4 @@ indlogPost <- function(object,...){
 indlogPost.GDINA <- function(object,...){
   return(extract(object,"logposterior.i"))
 }
+

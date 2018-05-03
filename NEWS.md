@@ -1,3 +1,9 @@
+# GDINA 2.1
+* Added   - experimental functions for simulating and estimating diagnostic tree model (to be optimized)
+* Fixed   - bugs in `dif` function and `startGDINA` function
+* Changed - `logLik` function to be consistent with default S3 methods
+* Added   - Q-matrix validation using stepwise Wald test
+
 # GDINA 2.0.7
 * bug fixed
 

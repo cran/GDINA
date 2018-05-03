@@ -118,8 +118,15 @@ print.Qval <-
   {
     sugQ <- data.frame(extract.Qval(x,"sug.Q"))
     oriQ <- data.frame(extract.Qval(x,"Q"))
+    if(toupper(x$method)=="PVAF"){
+      m <- "PVAF method"
+    }else{
+      m <- paste(ifelse(x$wald.args$stepwise,"Stepwise","Forward"),"Wald test")
+    }
+    cat("\nQ-matrix validation based on",m,"\n")
     if(any(sugQ!=oriQ)){
-      cat("Suggested Q-matrix: \n")
+
+      cat("\nSuggested Q-matrix: \n\n")
       sugQ[sugQ!=oriQ] <- paste0(sugQ[sugQ!=oriQ],"*")
       print(sugQ,right = FALSE)
       cat("Note: * denotes a modified element.\n")
@@ -248,22 +255,6 @@ print.summary.autoGDINA <- function(x,...){
 }
 
 
-#'@export
-print.AIC.GDINA <- function(x,...){
-  cat("AIC =",x)
-}
-#'@export
-print.BIC.GDINA <- function(x,...){
-  cat("BIC =",x)
-}
-#'@export
-print.logLik.GDINA <- function(x,...){
-  cat("logLik =",x)
-}
-#'@export
-print.deviance.GDINA <- function(x,...){
-  cat("deviance =",x)
-}
 #'@export
 print.npar.GDINA <- function(x,...){
   cat("No. of total parameters =",x$`No. of parameters`,"\n")
