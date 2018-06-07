@@ -1,4 +1,9 @@
-# GDINA 2.1
+# GDINA 2.1.15
+* Changed - arguments for `plot` function
+* Added   - additional example for `ecpe` data
+* Changed - graphical interface
+
+# GDINA 2.1.7
 * Added   - experimental functions for simulating and estimating diagnostic tree model (to be optimized)
 * Fixed   - bugs in `dif` function and `startGDINA` function
 * Changed - `logLik` function to be consistent with default S3 methods
