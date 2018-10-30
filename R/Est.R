@@ -4,6 +4,10 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
                 linkfunc,higher.order, solver,auglag_args,nloptr_args,
                 DesignMatrices,ConstrPairs,control){
 
+
+  # "LOGGDINA","LOGITGDINA","UDF", "GDINA", "DINA","DINO","ACDM","LLM", "RRUM" or "MSDINA"
+  #   -3           -2         -1      0        1      2      3      4      5          6
+
   myAuglag_args <-
     list(control.outer = list(
       trace = FALSE,
@@ -45,7 +49,8 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
     lower.prior = lower.prior,
     randomseed = 123456,
     smallNcorrection = c(.0005, .001),
-    MstepMessage = FALSE
+    MstepMessage = FALSE,
+    countitemparm = 0 # if an item parameter is fixed, it will not count as a parameter
   )
 
   control <- utils::modifyList(myControl,control)
@@ -108,13 +113,10 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
 
     J <- ncol(dat)
 
-    M <- c("UDF", "GDINA", "DINA", "DINO", "ACDM", "LLM", "RRUM", "MSDINA")
+    M <- c("logGDINA","logitGDINA","UDF", "GDINA", "DINA", "DINO", "ACDM", "LLM", "RRUM", "MSDINA")
 
     model <- model.transform(model, nrow(Q))
-
-  # polytomous responses -> dichotomous responses
-  # copy Q and data
-
+# print(model)
     if (any(model == 6)) {
       #MSDINA
       msQ <- unrestrQ(Q[which(model == 6), ])
@@ -122,16 +124,19 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
         Q[which(Q[, 1] == j &
                   Q[, 2] == 1), ] <- msQ[which(msQ[, 1] == j & msQ[, 2] == 1), ]
         loc <- which(Q[, 1] == j & Q[, 2] != 1)
-        Q <- Q[-loc, ]
-        model <- model[-loc]
+        if(length(loc)>0){
+          Q <- Q[-loc, ]
+          model <- model[-loc]
+        }
+
       }
     }
 
     Qcm <- Q
 
-  model.names <- M[model + 2]
+  model.names <- M[model + 4]
   names(model.names) <- item.names
-
+  # print(Q)
   inputcheck(
     dat = dat,
     Q = Q,
@@ -151,7 +156,7 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
     maxitr = control$maxitr
   )
 
-  if(att.str&(any(model<0)|any(model>2)))stop("Attribute structure is only applicable for DINA, DINO and G-DINA models",call. = FALSE)
+  if(att.str&(any(model<0)|any(model>2)))stop("Attribute structure can only be imposed for the DINA, DINO and G-DINA models.",call. = FALSE)
 
   if (sequential) {
     Q <- Q[,-c(1, 2)]
@@ -197,6 +202,8 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
       DesignMatrices[[j]] <- designmatrix(Kj[j],model[j])
     }else if(model[j]==6){
       DesignMatrices[[j]] <- designmatrix(model = model[j],Qj = originalQ[which(originalQ[,1]==j),-c(1:2),drop=FALSE])
+    }else if(model[j]==-2||model[j]==-3){
+      DesignMatrices[[j]] <- designM(Kj[j],0)
     }
     if(mono.constraint[[j]]){
       ConstrType[j] <- 3
@@ -212,7 +219,10 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
 
   if(is.null(linkfunc)){
     linkfunc <- rep(1,J)
-    for(j in seq_len(J)) if(model[j]==4) linkfunc[j] <- 2 else if(model[j]==5) linkfunc[j] <- 3
+    for(j in seq_len(J)){
+      if(model[j] == 4 || model[j] == -2) linkfunc[j] <- 2 else
+        if(model[j] == 5 || model[j] == -3) linkfunc[j] <- 3
+    }
   }else if (length(linkfunc) == 1){
     linkfunc <- which(tolower(linkfunc)==c("identity","logit","log"))
     linkfunc <- rep(linkfunc, J)
@@ -225,14 +235,12 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
   }
 
 
-
-
   lambda <- vector("list",no.mg)
 
   if(any(att.dist=="higher.order")){
 
     myHO <- list(model = "Rasch",nquad = 25L, SlopeRange = c(0.1,5), InterceptRange = c(-4,4), Prior = FALSE,
-                 SlopePrior = c(0,0.25), InterceptPrior = c(0L,1L), Type = "SameTheta")
+                 SlopePrior = c(0,0.25), InterceptPrior = c(0L,1L), anchor = "all")
     # GH <- gaussHermiteData(myHO$nquad)
     # myHO$QuadNodes = matrix(GH$x*sqrt(2),nrow = myHO$nquad,ncol = no.mg)
     # myHO$QuadWghts = matrix(GH$w/sqrt(pi),nrow = myHO$nquad,ncol = no.mg)
@@ -245,10 +253,15 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
 
   }else{
     higher.order <- NULL
-    for(g in seq_len(no.mg)){
-      if(att.dist[g]=="independent"){lambda[[g]] <- matrix(c(rep(0,K),rnorm(K,0,0.5)),ncol = 2)}
+    if(any(att.dist=="independent")){
+      for(g in seq_len(no.mg)){
+        if(att.dist[g]=="independent")
+          lambda[[g]] <- matrix(c(rep(0,K),rnorm(K,0,0.5)),ncol = 2)
+      }
     }
+
   }
+
 
   # Generate the log prior - a L x no.mg matrix
   if (is.null(att.prior)) {
@@ -343,6 +356,7 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
   initial.parm <- item.parm
 
 
+
   ##############################
   #
   # variable declarations
@@ -398,18 +412,16 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
                                   Ng=Ng,K=K,N=N,higher.order=higher.order,lambda = lambda)
 
     if(!is.null(higher.order)){
-      if(no.mg>1&all(att.dist=="higher.order")&higher.order$Type == "SameLambda"){
-
-        higher.order <- struc.parm$higher.order
-
+      higher.order <- struc.parm$higher.order
+      ho.npar <- struc.parm$higher.order.npar
       }
-    }
 
 
 
     lambda <- struc.parm$lambda
     logprior <- struc.parm$logprior
 
+    # logprior <- estep$logprior
 
 
     parm1 <- list(ip = c(item.parm),
@@ -430,12 +442,12 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
     if(any(tolower(control$conv.type)=="mp"))  maxchg <- max(maxchg,dif.parm$prior)
     if(any(tolower(control$conv.type)=="neg2ll"))  maxchg <- max(maxchg,abs(dif.parm$neg2LL))
 
-    if(verbose==1) {
+    if(verbose==1L) {
       cat('\rIter =',itr,' Max. abs. change =',formatC(maxchg,digits = 5, format = "f"),
-          ' Deviance  =',formatC(-2 * estep$LL,digits = 3, format = "f"),'                                                                                 ')
-    }else if (verbose==2) {
+          ' Deviance  =',formatC(-2 * estep$LL,digits = 2, format = "f"),'                                                                                 ')
+    }else if (verbose==2L) {
       cat('Iter =',itr,' Max. abs. change =',formatC(maxchg,digits = 5, format = "f"),
-          ' Deviance  =',formatC(-2 * estep$LL,digits = 3, format = "f"),'                                                                                \n')
+          ' Deviance  =',formatC(-2 * estep$LL,digits = 2, format = "f"),'                                                                                \n')
     }
 
     if(maxchg < control$conv.crit) break
@@ -452,35 +464,47 @@ Est <- function(dat, Q, model, sequential,att.dist, att.prior,saturated,
                  mloc = as.matrix(parloc),
                  weights = rep(1,N),
                  simplify = 0)
-if(!att.str){
-  npar <- sum(sapply(DesignMatrices,ncol))
-}else{
-  npar <- sum(is.finite(c(item.parm)))
-}
 
-  item.npar <- npar  #item parameters
+  total.item.npar <- 0
+
+  if(!att.str){
+    total.item.npar <- sum(sapply(DesignMatrices,ncol))
+  }else{
+    total.item.npar <- sum(is.finite(c(item.parm)))
+  }
+
+  free.item.npar <- 0
+
+  if(any(control$vmaxitr>0)){
+    est.item <- which(control$vmaxitr>0)
+    if(!att.str){
+      free.item.npar <- sum(sapply(DesignMatrices[est.item],ncol))
+    }else{
+      free.item.npar <- sum(is.finite(c(item.parm[est.item,,drop=FALSE])))
+    }
+  }
+
+  stru.npar <- 0
+
+  if (any(att.dist=="higher.order")) {
+    stru.npar <- ho.npar
+  }
   for(g in 1:no.mg){
     if (att.dist[g]=="saturated") {
       if (!att.str) {
-        npar <- npar + L - 1
+        stru.npar <- stru.npar + L - 1
       } else {
-        npar <- npar + sum(is.finite(logprior[,g])) - 1
+        stru.npar <- stru.npar + sum(is.finite(logprior[,g])) - 1
       }
-    } else if (att.dist[g]=="higher.order") {
-      if (higher.order$model == "Rasch") {
-        npar <- npar + K
-      } else if (higher.order$model == "2PL") {
-        npar <- npar + 2 * K
-      } else if (higher.order$model == "1PL") {
-        npar <- npar + 1 + K
-      }
-
     }else if(att.dist[g]=="loglinear"){
-      npar <- npar + sum(sapply(seq_len(loglinear[g]),choose,n=K)) + 1
+      stru.npar <- stru.npar + sum(sapply(seq_len(loglinear[g]),choose,n=K)) + 1
     }else if(att.dist[g]=="independent"){
-      npar <- npar + K
+      stru.npar <- stru.npar + K
     }
   }
+
+  npar <- free.item.npar + stru.npar
+
   neg2LL <- -2 * estep$LL
 
   item.prob <- vector("list",J)
@@ -509,8 +533,10 @@ if(!att.str){
     }
     LC.Prob <- p
   }
+
+  LC.labels <- apply(AlphaPattern,1,paste0,collapse = "")
   names(item.prob) <- names(initial.parm) <- rownames(LC.Prob) <- names(delta) <- rownames(item.parm) <- item.names
-  colnames(LC.Prob) <- colnames(pf) <- colnames(postP) <- apply(attributepattern(Q = Q),1,paste0,collapse = "")
+  colnames(LC.Prob) <- colnames(pf) <- colnames(postP) <- LC.labels
 
   if(!is.null(group)) rownames(postP) <- paste("Group",gr.label)
 
@@ -523,9 +549,11 @@ if(!att.str){
   list(catprob.parm = item.prob, delta.parm = delta, catprob.matrix = item.parm,
        struc.parm = lambda, model = model.names, LC.prob = LC.Prob,
        posterior.prob = postP, pf = pf,
-       testfit = list(Deviance=neg2LL,npar = npar,item.npar = item.npar, AIC=2 * npar + neg2LL, BIC=neg2LL + npar * log(N)),
-       technicals = list(logposterior.i = estep$logpost, loglikelihood.i = estep$loglik,
-                         expectedCorrect = estep$Rg, expectedTotal = estep$Ng,initial.parm = initial.parm),
+       testfit = list(Deviance=neg2LL,npar = npar,item.npar = free.item.npar, AIC=2 * npar + neg2LL, BIC=neg2LL + npar * log(N)),
+       technicals = list(logposterior.i = estep$logpost, loglikelihood.i = estep$loglik, free.item.npar = free.item.npar,
+                         total.item.npar = total.item.npar, stru.npar = stru.npar, total.npar = npar,
+                         expectedCorrect = estep$Rg, expectedTotal = estep$Ng,initial.parm = initial.parm,
+                         LC.labels = LC.labels),
        options = list(dat = originalData, Q = originalQ, Qm = Q, Qcm = Qcm, model = model,
                       itr = itr, dif.LL = dif.parm$neg2LL,dif.p=dif.parm$ip,dif.prior=dif.parm$prior,
                       att.dist=att.dist, higher.order=higher.order,att.prior = att.prior, latent.var = latent.var,

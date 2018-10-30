@@ -63,9 +63,12 @@ npar <- function(object,...){
 #' @describeIn GDINA calculate the number of parameters
 npar.GDINA <- function(object,...){
   out <- list(npar=extract(object, what = "npar"),
-    npar.item=extract(object, what = "npar.item"),
-    npar.att=extract(object, what = "npar.att"))
-  names(out) <- c("No. of parameters","No. of item parameters","No. of population parameters")
+    npar.item=extract(object, what = "npar.item"), # free param
+    npar.att=extract(object, what = "npar.att"),
+    npar.total.item=extract(object, what = "npar.item") + extract(object, what = "npar.fixeditem"),
+    npar.fix.item=extract(object, what = "npar.fixeditem"))
+  names(out) <- c("No. of parameters","No. of estimated item parameters","No. of population parameters",
+                  "No. of total item parameters","No. of fixed item parameters")
   class(out) <- "npar.GDINA"
   return(out)
 }
@@ -92,7 +95,9 @@ indlogLik <- function(object,...){
 #' @export
 #' @describeIn GDINA extract log-likelihood for each individual
 indlogLik.GDINA <- function(object,...){
-  return(extract(object,"loglikelihood.i"))
+  x <- extract(object,"loglikelihood.i")
+  colnames(x) <- extract(object,"LC.labels")
+  return(x)
 }
 
 #' @title Extract log posterior for each individual
@@ -115,6 +120,8 @@ indlogPost <- function(object,...){
 #' @export
 #' @describeIn GDINA extract log posterior for each individual
 indlogPost.GDINA <- function(object,...){
-  return(extract(object,"logposterior.i"))
+  x <- extract(object,"logposterior.i")
+  colnames(x) <- extract(object,"LC.labels")
+  return(x)
 }
 

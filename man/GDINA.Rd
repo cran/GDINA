@@ -17,24 +17,25 @@
 \alias{summary.GDINA}
 \title{CDM calibration under the G-DINA model framework}
 \usage{
-GDINA(dat, Q, model = "GDINA", sequential = FALSE, att.dist = "saturated",
-  mono.constraint = FALSE, group = NULL, linkfunc = NULL,
-  design.matrix = NULL, latent.var = "att", att.prior = NULL,
-  att.str = FALSE, verbose = 1, higher.order = list(), loglinear = 2,
-  catprob.parm = NULL, control = list(), item.names = NULL,
-  solver = NULL, nloptr.args = list(), auglag.args = list(),
-  solnp.args = list(), ...)
+GDINA(dat, Q, model = "GDINA", sequential = FALSE,
+  att.dist = "saturated", mono.constraint = FALSE, group = NULL,
+  linkfunc = NULL, design.matrix = NULL, latent.var = "att",
+  att.prior = NULL, att.str = FALSE, verbose = 1,
+  higher.order = list(), loglinear = 2, catprob.parm = NULL,
+  control = list(), item.names = NULL, solver = NULL,
+  nloptr.args = list(), auglag.args = list(), solnp.args = list(),
+  ...)
 
 \method{anova}{GDINA}(object, ...)
 
-\method{coef}{GDINA}(object, what = c("catprob", "delta", "gs", "itemprob",
-  "LCprob", "rrum", "lambda"), withSE = FALSE, SE.type = 2, digits = 4,
-  ...)
+\method{coef}{GDINA}(object, what = c("catprob", "delta", "gs",
+  "itemprob", "LCprob", "rrum", "lambda"), withSE = FALSE, SE.type = 2,
+  digits = 4, ...)
 
 \method{extract}{GDINA}(object, what, SE.type = 2, ...)
 
-\method{personparm}{GDINA}(object, what = c("EAP", "MAP", "MLE", "mp", "HO"),
-  digits = 4, ...)
+\method{personparm}{GDINA}(object, what = c("EAP", "MAP", "MLE", "mp",
+  "HO"), digits = 4, ...)
 
 \method{logLik}{GDINA}(object, ...)
 
@@ -68,7 +69,9 @@ For binary attributes, 1 denotes the attributes are measured by the items and 0 
 
 \item{model}{A vector for each item or nonzero category, or a scalar which will be used for all
 items or nonzero categories to specify the CDMs fitted. The possible options
-include \code{"GDINA"},\code{"DINA"},\code{"DINO"},\code{"ACDM"},\code{"LLM"}, \code{"RRUM"}, \code{"MSDINA"} and \code{"UDF"}.
+include \code{"GDINA"},\code{"DINA"},\code{"DINO"},\code{"ACDM"},\code{"LLM"}, \code{"RRUM"}, \code{"MSDINA"} and \code{"UDF"}. Note that
+model can also be \code{"logitGDINA"} and \code{"logGDINA"}, indicating the saturated G-DINA model in logit and log link functions. They are
+equivalent to the identity link saturated G-DINA model. The logit G-DINA model is identical to the log-linear CDM.
 When \code{"UDF"}, indicating user defined function, is specified for any item, arguments \code{design.matrix} and \code{linkfunc} need to be defined.}
 
 \item{sequential}{logical; \code{TRUE} if the sequential model is fitted for polytomous responses.}
@@ -138,7 +141,7 @@ and with main effect and first-order interaction.}
 \itemize{
      \item \code{maxitr} A vector for each item or nonzero category, or a scalar which will be used for all
    items or nonzero categories to specify the maximum number of EM cycles allowed. Default = 2000.
-    \item \code{conv.crit} The convergence criterion for max absolute change in item parameters or deviance. Default = 0.0001.
+    \item \code{conv.crit} The convergence criterion. Default = 0.0001.
     \item \code{conv.type} How is the convergence criterion evaluated? A vector with possible elements: \code{"ip"}, indicating
    the maximum absolute change in item success probabilities, \code{"mp"}, representing
    the maximum absolute change in mixing proportion parameters, \code{"delta"}, indicating the maximum absolute change in delta
@@ -883,11 +886,14 @@ coef(est)
 dat <- sim30GDINA$simdat
 Q <- sim30GDINA$simQ
 
-#find design matrix for each item => must be a list
+# LCDM
+lcdm <- GDINA(dat = dat, Q = Q, model = "logitGDINA", control=list(conv.type="neg2LL"))
+
+#Another way is to find design matrix for each item first => must be a list
 D <- lapply(rowSums(Q),designmatrix,model="GDINA")
 # for comparison, use change in -2LL as convergence criterion
 # LCDM
-lcdm <- GDINA(dat = dat, Q = Q, model = "UDF", design.matrix = D,
+lcdm2 <- GDINA(dat = dat, Q = Q, model = "UDF", design.matrix = D,
 linkfunc = "logit", control=list(conv.type="neg2LL"),solver="slsqp")
 
 # identity link GDINA
@@ -895,7 +901,7 @@ iGDINA <- GDINA(dat = dat, Q = Q, model = "GDINA",
 control=list(conv.type="neg2LL"),solver="slsqp")
 
 # compare two models => identical
-anova(lcdm,iGDINA)
+anova(lcdm,lcdm2,iGDINA)
 
 ####################################
 #           Example 13b.           #

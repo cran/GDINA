@@ -5,10 +5,9 @@
 
 StartWelcomeMessage <- function(){
 
-  paste("==============================================\n",
-        "GDINA Package for Cognitive Diagnosis Modeling\n",
-        "        Version ", utils::packageDescription("GDINA")$Version,
-        " (",utils::packageDescription("GDINA")$Date, ")\n",
-        "==============================================\n",
+  paste("GDINA Package",
+        " [Version ", utils::packageDescription("GDINA")$Version,
+        "; ",utils::packageDescription("GDINA")$Date, "]\n",
+        "More information: https://wenchao-ma.github.io/GDINA\n",
         sep="")
 }

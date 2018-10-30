@@ -2,7 +2,7 @@
 #'
 #' An experimental interactive Shiny application for running GDINA function
 #'
-#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu}}
 #' @examples
 #' \dontrun{
 #' library(shiny)
@@ -16,7 +16,8 @@ startGDINA <- function() {
     stop("shiny and shinydashboard needed for startGDINA. Please install them.",
          call. = FALSE)
   }
-  cat("Please wait while loading...")
-  shiny::runApp(appDir = system.file("shiny", package="GDINA"))
+  cat("Please wait while loading...\n")
+  shiny::runApp(appDir = system.file("shiny", package="GDINA"),
+                launch.browser = TRUE)
 
 }

@@ -17,15 +17,20 @@
 #'@aliases extract.modelcomp
 #'@export
 extract.modelcomp <- function(object,
-                              what=c("stats","pvalues","adj.pvalues","df","DS","models"), digits = 4,...){
-  what <- match.arg(what)
+                              what=c("stats","pvalues","adj.pvalues","df","DS","selected.model"), digits = 4,...){
+  # what <- match.arg(what)
   out <- switch(what,
                 stats = round(object$stats,digits),
                 pvalues = round(object$pvalues,digits),
                 adj.pvalues = round(object$adj.pvalues,digits),
                 df = object$df,
                 DS = {if(is.null(object$DS)) NULL else round(object$DS,digits)},
-                models = object$models)
+                models = object$models,
+                decision.args = object$decision.args,
+                selected.model = object$selected.model,
+                Wald.args = object$Wald.args,
+                LR.args = object$LR.args,
+                neg2LL = object$neg2LL)
   return(out)
 }
 
@@ -287,6 +292,7 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                 itemprob.history = object$diagnos$itemprob.matrix,
                 Kj = {rowSums(extract(object,"Q"))},
                 latent.var = object$options$latent.var,
+                LC.labels = object$technicals$LC.labels,
                 LCprob.parm = object$LC.prob,
                 LCpf.parm = {
                   LCpf <- patt <- eta(as.matrix(extract(object,"Q")))
@@ -303,9 +309,10 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                 models = object$model,
                 models_numeric = object$options$model,
                 mono.constraint = object$options$mono.constraint,
-                npar = object$testfit$npar,
-                npar.item = object$testfit$item.npar,
-                npar.att = object$testfit$npar - object$testfit$item.npar,
+                npar = object$technicals$total.npar,
+                npar.item = object$technicals$free.item.npar, # free parameters
+                npar.fixeditem = object$technicals$total.item.npar - object$technicals$free.item.npar,
+                npar.att = object$technicals$stru.npar,
                 natt = ncol(extract(object,"Q")),
                 ncat = nrow(extract(object,"Q")),
                 ngroup = object$options$no.group,

@@ -159,7 +159,9 @@
 #'    of attributes are needed (see Chen, & de la Torre, 2013).  See \code{Examples}.
 #' @param model A vector for each item or nonzero category, or a scalar which will be used for all
 #'    items or nonzero categories to specify the CDMs fitted. The possible options
-#'    include \code{"GDINA"},\code{"DINA"},\code{"DINO"},\code{"ACDM"},\code{"LLM"}, \code{"RRUM"}, \code{"MSDINA"} and \code{"UDF"}.
+#'    include \code{"GDINA"},\code{"DINA"},\code{"DINO"},\code{"ACDM"},\code{"LLM"}, \code{"RRUM"}, \code{"MSDINA"} and \code{"UDF"}. Note that
+#'    model can also be \code{"logitGDINA"} and \code{"logGDINA"}, indicating the saturated G-DINA model in logit and log link functions. They are
+#'    equivalent to the identity link saturated G-DINA model. The logit G-DINA model is identical to the log-linear CDM.
 #'    When \code{"UDF"}, indicating user defined function, is specified for any item, arguments \code{design.matrix} and \code{linkfunc} need to be defined.
 #' @param sequential logical; \code{TRUE} if the sequential model is fitted for polytomous responses.
 #' @param group a numerical vector with integer 1, 2, ..., # of groups indicating the group each individual belongs to. It must start from 1 and its
@@ -211,7 +213,7 @@
 #' \itemize{
 #'      \item \code{maxitr} A vector for each item or nonzero category, or a scalar which will be used for all
 #'    items or nonzero categories to specify the maximum number of EM cycles allowed. Default = 2000.
-#'     \item \code{conv.crit} The convergence criterion for max absolute change in item parameters or deviance. Default = 0.0001.
+#'     \item \code{conv.crit} The convergence criterion. Default = 0.0001.
 #'     \item \code{conv.type} How is the convergence criterion evaluated? A vector with possible elements: \code{"ip"}, indicating
 #'    the maximum absolute change in item success probabilities, \code{"mp"}, representing
 #'    the maximum absolute change in mixing proportion parameters, \code{"delta"}, indicating the maximum absolute change in delta
@@ -799,11 +801,14 @@
 #' dat <- sim30GDINA$simdat
 #' Q <- sim30GDINA$simQ
 #'
-#' #find design matrix for each item => must be a list
+#' # LCDM
+#' lcdm <- GDINA(dat = dat, Q = Q, model = "logitGDINA", control=list(conv.type="neg2LL"))
+#'
+#' #Another way is to find design matrix for each item first => must be a list
 #' D <- lapply(rowSums(Q),designmatrix,model="GDINA")
 #' # for comparison, use change in -2LL as convergence criterion
 #' # LCDM
-#' lcdm <- GDINA(dat = dat, Q = Q, model = "UDF", design.matrix = D,
+#' lcdm2 <- GDINA(dat = dat, Q = Q, model = "UDF", design.matrix = D,
 #' linkfunc = "logit", control=list(conv.type="neg2LL"),solver="slsqp")
 #'
 #' # identity link GDINA
@@ -811,7 +816,7 @@
 #' control=list(conv.type="neg2LL"),solver="slsqp")
 #'
 #' # compare two models => identical
-#' anova(lcdm,iGDINA)
+#' anova(lcdm,lcdm2,iGDINA)
 #'
 #'####################################
 #'#           Example 13b.           #

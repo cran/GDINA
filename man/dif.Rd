@@ -5,9 +5,9 @@
 \alias{summary.dif}
 \title{Differential item functioning for cognitive diagnosis models}
 \usage{
-dif(dat, Q, group, method = "wald", p.adjust.methods = "bonferroni",
-  LR.type = "free.all", LR.approx = FALSE, difitem = "all", SE.type = 2,
-  ...)
+dif(dat, Q, group, model = "GDINA", method = "wald",
+  anchor.items = NULL, dif.items = "all",
+  p.adjust.methods = "bonferroni", approx = FALSE, SE.type = 2, ...)
 
 \method{summary}{dif}(object, ...)
 }
@@ -19,21 +19,22 @@ dif(dat, Q, group, method = "wald", p.adjust.methods = "bonferroni",
 \item{group}{a numerical vector with integer 1, 2, ..., # of groups indicating the group each individual belongs to. It must start from 1 and its
 length must be equal to the number of individuals.}
 
+\item{model}{model for each item.}
+
 \item{method}{DIF detection method; It can be \code{"wald"} for Hou, de la Torre, and Nandakumar's (2014)
 Wald test method, and \code{"LR"} for likelihood ratio test (Ma, Terzi, Lee,& de la Torre, 2017).}
+
+\item{anchor.items}{which items will be used as anchors? Default is \code{NULL}, which means none of the items are used as anchors.
+For LR method, it can also be an integer vector giving the item numbers for anchors or \code{"all"}, which means all items are treated as anchor items.}
+
+\item{dif.items}{which items are subject to DIF detection? Default is \code{"all"}. It can also be an integer vector giving the item numbers.}
 
 \item{p.adjust.methods}{adjusted p-values for multiple hypothesis tests. This is conducted using \code{p.adjust} function in \pkg{stats},
 and therefore all adjustment methods supported by \code{p.adjust} can be used, including \code{"holm"},
 \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"} and \code{"BY"}. See \code{p.adjust}
 for more details. \code{"bonferroni"} is the default.}
 
-\item{LR.type}{Type of likelihood ratio test for DIF detection. It can be \code{'free.all'} or
-\code{'free.one'}. For \code{'free.all'}, there are no anchor items, and for \code{'free.one'},
-all items except the studied item are treated as anchor items (i.e., they have the same item parameters between groups). See Ma, Terzi, Lee, and de la Torre (2017).}
-
-\item{LR.approx}{Whether an approximated LR test is implemented? If TRUE, parameters of items except the studied one will not be re-estimated.}
-
-\item{difitem}{Items for the DIF detection. By default, all items will be examined.}
+\item{approx}{Whether an approximated LR test is implemented? If TRUE, parameters of items except the studied one will not be re-estimated.}
 
 \item{SE.type}{Type of standard error estimation methods for the Wald test.}
 
