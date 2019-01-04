@@ -2,7 +2,7 @@
 % Please edit documentation in R/DTM.R
 \name{DTM}
 \alias{DTM}
-\title{Calibrate diagnostic tree model (experimental)}
+\title{Experimental function for diagnostic multiple-strategy CDMs}
 \usage{
 DTM(dat, Qc, delta = NULL, Tmatrix = NULL, conv.crit = 0.001,
   conv.type = "pr", maxitr = 1000)
@@ -30,7 +30,7 @@ indicating category response function, log-likelihood and delta parameters,respe
 \item{maxitr}{The maximum iterations allowed.}
 }
 \description{
-This function estimates the diagnostic tree model (Ma, 2018). It is an experimental function, and will be further optimized.
+This function estimates the diagnostic tree model (Ma, 2018) for polytomous responses with multiple strategies. It is an experimental function, and will be further optimized.
 }
 \examples{
 \dontrun{
@@ -55,4 +55,11 @@ est <- DTM(dat=sim$dat,Qc=Qc,Tmatrix = Tmatrix)
 }
 \references{
 Ma, W. (2018). A Diagnostic Tree Model for Polytomous Responses with Multiple Strategies. \emph{British Journal of Mathematical and Statistical Psychology.}
+}
+\seealso{
+\code{\link{GDINA}} for MS-DINA model and single strategy CDMs,
+and \code{\link{GMSCDM}} for generalized multiple strategies CDMs for dichotomous response data
+}
+\author{
+{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu}}
 }

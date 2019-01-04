@@ -177,6 +177,7 @@ extract <- function (object, what, ...) {
 extract.GDINA <- function(object,what,SE.type = 2,...){
   out <- switch(what,
                 AIC = object$testfit$AIC,
+                attributepattern = object$attributepattern,
                 att.dist = object$options$att.dist,
                 att.prior = object$options$att.prior,
                 att.str=object$options$att.str,
@@ -185,10 +186,11 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                 catprob.matrix = object$catprob.matrix,
                 catprob.parm = object$catprob.parm,
                 catprob.se = {
-                  if(SE.type==3&any(extract(object,"att.dist")=="higher.order"))stop("standard error cannot be calculated.",call. = FALSE)
+                  if(SE.type==3&any(extract(object,"att.dist")=="higher.order"))
+                    stop("standard error cannot be calculated.",call. = FALSE)
                   Kj <- extract(object, "Kj")
                   se <- OPG_p(object, SE.type = SE.type, ...)$se
-                  for (j in 1:length(se)) names(se[[j]]) <- paste0("SE[P(", apply(attributepattern(Kj[j]), 1, paste0, collapse = ""), ")]")
+                  for (j in 1:length(se)) names(se[[j]]) <- paste0("SE[P(", apply(extract(object,"reduced.LG")[[j]], 1, paste0, collapse = ""), ")]")
                   names(se) <- object$options$item.names
                   se
                 },
@@ -219,6 +221,7 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                   colnames(Discrim) <- c("P(1)-P(0)", "GDI")
                   Discrim
                 },
+                eta = object$technicals$eta,
                 end.time = object$extra$end.time,
                 expectedCorrect = object$technicals$expectedCorrect,
                 expectedTotal = object$technicals$expectedTotal,
@@ -324,7 +327,7 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                 prevalence = {
                   Q <- extract(object,"Q")
                   preva <- vector("list",extract(object,"ngroup"))
-                  pattern <- attributepattern(Q = Q)
+                  pattern <- extract(object,"attributepattern")
                   for(g in 1:extract(object,"ngroup")) {
                     for (i in c(0:max(Q))) {
                       preva[[g]] <-
@@ -359,6 +362,7 @@ extract.GDINA <- function(object,what,SE.type = 2,...){
                     paste0("A", 1:ncol(object$options$Q))
                   out
                 }},
+                reduced.LG = object$technicals$reduced.LG,
                 originalQ = object$options$Q,
                 start.time = object$extra$start.time,
                 time = object$extra$timeused,

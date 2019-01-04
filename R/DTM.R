@@ -1,6 +1,6 @@
-#' Calibrate diagnostic tree model (experimental)
+#' Experimental function for diagnostic multiple-strategy CDMs
 #'
-#' This function estimates the diagnostic tree model (Ma, 2018). It is an experimental function, and will be further optimized.
+#' This function estimates the diagnostic tree model (Ma, 2018) for polytomous responses with multiple strategies. It is an experimental function, and will be further optimized.
 #'
 #'
 #' @param dat A required \eqn{N \times J} data matrix of N examinees to J items. Missing
@@ -41,7 +41,10 @@
 #'
 #' Ma, W. (2018). A Diagnostic Tree Model for Polytomous Responses with Multiple Strategies. \emph{British Journal of Mathematical and Statistical Psychology.}
 #'
+#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu}}
 #'
+#' @seealso \code{\link{GDINA}} for MS-DINA model and single strategy CDMs,
+#' and \code{\link{GMSCDM}} for generalized multiple strategies CDMs for dichotomous response data
 #' @export
 DTM <- function(dat, Qc, delta = NULL, Tmatrix = NULL, conv.crit = 0.001, conv.type = "pr",maxitr = 1000){
 

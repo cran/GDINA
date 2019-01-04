@@ -29,14 +29,14 @@
 #' a saturated model or a hierarchical structures (e.g., linear, divergent). Monotonicity constraints for item/category success
 #' probabilities can also be specified.
 #'
-#' In addition, to handle multiple strategies in ordinal response data, diagnostic treee model (Ma, 2018) can also
-#' be estimated using \code{\link{DTM}} function. Note that this function is experimental, and is expected to be further extended
+#' In addition, to handle multiple strategies, generalized multiple-strategy CDMs for dichotomous response (Ma & Guo, 2019) can be fitted using \code{\link{GMSCDM}} function and
+#' diagnostic tree model (Ma, 2018) can also be estimated using \code{\link{DTM}} function for polytomous responses. Note that these functions are experimental, and are expected to be further extended
 #' in the future.
 #'
-#' Q-matrix validation (de la Torre, & Chiu, 2016; see \code{\link{Qval}}),
-#' imodel fit statistics (see \code{\link{modelfit}} and \code{\link{itemfit}}),
+#' Q-matrix validation (de la Torre, & Chiu, 2016; de la Torre & Ma, 2016; Ma & de la Torre, 2019; see \code{\link{Qval}}),
+#' model fit statistics (see \code{\link{modelfit}} and \code{\link{itemfit}}),
 #' model comparison at test and item level (de la Torre, & Lee, 2013;
-#' Ma, Iaconangelo, & de la Torre, 2016; see \code{\link{modelcomp}}),
+#' Ma, Iaconangelo, & de la Torre, 2016; Ma & de la Torre, 2019; see \code{\link{modelcomp}}),
 #' and differential item functioning (Hou, de la Torre, & Nandakumar, 2014;
 #' see \code{\link{dif}}) can also be conducted.
 #' @name GDINA-package
@@ -68,6 +68,8 @@
 #' de la Torre, J., & Lee, Y. S. (2013). Evaluating the wald test for item-level comparison of
 #' saturated and reduced models in cognitive diagnosis. \emph{Journal of Educational Measurement, 50}, 355-373.
 #'
+#' de la Torre, J., & Ma, W. (2016, August). Cognitive diagnosis modeling: A general framework approach and its implementation in R. A Short Course at the Fourth Conference on Statistical Methods in Psychometrics, Columbia University, New York.
+#'
 #' Haertel, E. H. (1989). Using restricted latent class models to map the skill structure of achievement items.
 #' \emph{Journal of Educational Measurement, 26}, 301-321.
 #'
@@ -83,6 +85,10 @@
 #' Ma, W. (2018). A Diagnostic Tree Model for Polytomous Responses with Multiple Strategies. \emph{British Journal of Mathematical and Statistical Psychology.}
 #'
 #' Ma, W., & de la Torre, J. (2016). A sequential cognitive diagnosis model for polytomous responses. \emph{British Journal of Mathematical and Statistical Psychology. 69,} 253-275.
+#'
+#' Ma, W., & de la Torre, J. (2018). Category-Level Model Selection for the Sequential G-DINA Model. \emph{Journal of Educational and Behavioral Statistics}. https://doi.org/10.3102/1076998618792484
+#'
+#' Ma, W., & de la Torre, J. (2019). An Empirical Q-Matrix Validation Method for the Sequential G-DINA Model. \emph{British Journal of Mathematical and Statistical Psychology}
 #'
 #' Ma, W., Iaconangelo, C., & de la Torre, J. (2016). Model similarity, model selection and attribute classification.
 #' \emph{Applied Psychological Measurement, 40}, 200-217.
