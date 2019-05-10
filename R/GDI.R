@@ -162,8 +162,8 @@ Qval_wald <- function(GDINA.obj, SE.type = 2,
   expectedR <- extract(GDINA.obj,"expectedCorrect.LC")
   expectedN <- extract(GDINA.obj,"expectedTotal.LC")
 
-  est.p <- t((expectedR)/(expectedN))
-  est.p[is.nan(est.p)] <- 0.5
+  est.p <- t((expectedR + 1e-10)/(expectedN + 2*1e-10))
+  # est.p[is.nan(est.p)] <- 0.5
   patt <- attributepattern(K)[-1,]
   loc <- LC2LG(patt) #2^K-1 x 2^K
   vsg <- varsigma(as.matrix(t(loc)),as.matrix(est.p),c(w)) # versigma
@@ -365,7 +365,7 @@ Qval_PVAF <- function(GDINA.obj,
     colSums(x * exp(extract(GDINA.obj, "logposterior.i")))
   })
   # est.p <- rc/c(w*N)
-  est.p <- rc / rn
+  est.p <- (rc + 1e-10) / (rn + 2* 1e-10)
   patt <- attributepattern(K)[-1, ]
   loc <- eta(patt) #2^K-1 x 2^K
   vsg <- varsigma(as.matrix(t(loc)), as.matrix(est.p), c(w))

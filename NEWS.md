@@ -1,3 +1,13 @@
+# GDINA 2.5.1
+* Added   - `ICLA()` function for attribute profile estimation
+* Changed - data are grouped before single group GDINA analysis 
+* Changed - data are aggregated before model estimation for single group CDMs
+* Deleted - exported internal functions are removed
+* Fixed   - `print.GDINA`()` prints valid number of individuals by default now
+* Fixed   - covariance matrix cannot be calculated when some individuals are deleted
+* Fixed   - `Qval` not work when estimated number of individuals in some latent classes are 0
+* Fixed   - `extract` only gives valid data
+
 # GDINA 2.4.0
 * Added   - Predicted cutoff based on the data for Q-matrix validation  
 * Changed - add .5 for elements 0 when calculating log odds statistic for item fit
