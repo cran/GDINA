@@ -432,6 +432,7 @@ SG.Est <- function(dat, Q, weight=NULL, model, sequential,att.dist, att.prior, s
       if(any(tolower(control$conv.type)=="delta"))  maxchg <- max(maxchg,dif.parm$delt)
       if(any(tolower(control$conv.type)=="mp"))  maxchg <- max(maxchg,dif.parm$prior)
       if(any(tolower(control$conv.type)=="neg2ll"))  maxchg <- max(maxchg,abs(dif.parm$neg2LL))
+      if(any(tolower(control$conv.type)=="relneg2ll"))  maxchg <- max(maxchg,abs(dif.parm$neg2LL)/parm0$neg2LL)
 
       if(verbose==1L) {
         cat('\rIter =',itr,' Max. abs. change =',formatC(maxchg,digits = 5, format = "f"),
@@ -511,7 +512,10 @@ SG.Est <- function(dat, Q, weight=NULL, model, sequential,att.dist, att.prior, s
   list(catprob.parm = item.prob, delta.parm = delta, catprob.matrix = item.parm,
        struc.parm = lambda, model = model2character(model), LC.prob = LC.Prob,
        posterior.prob = postP, pf = pf, attributepattern = AlphaPattern,
-       testfit = list(Deviance=neg2LL,npar = npar,item.npar = free.item.npar, AIC=2 * npar + neg2LL, BIC=neg2LL + npar * log(length(raw2unique))),
+       testfit = list(Deviance=neg2LL,npar = npar,item.npar = free.item.npar,
+                      AIC=2 * npar + neg2LL, BIC=neg2LL + npar * log(length(raw2unique)),
+                      CAIC=neg2LL + npar * log(length(raw2unique)+1),
+                      SABIC=neg2LL + npar * log((length(raw2unique)+2)/24)),
        technicals = list(logposterior.i = estep$logpost[raw2unique, ], loglikelihood.i = estep$loglik[raw2unique, ],
                          free.item.npar = free.item.npar,
                          total.item.npar = total.item.npar, stru.npar = stru.npar, total.npar = npar,
@@ -521,7 +525,7 @@ SG.Est <- function(dat, Q, weight=NULL, model, sequential,att.dist, att.prior, s
                       itr = itr, dif.LL = dif.parm$neg2LL,dif.p=dif.parm$ip,dif.prior=dif.parm$prior,
                       att.dist=att.dist, higher.order=higher.order,att.prior = att.prior, latent.var = latent.var,
                       mono.constraint = mono.constraint, item.names = item.names, group = rep(1,N), gr = gr,
-                      att.str= att.str,  seq.dat = dat, no.group = 1, group.label = "all",
+                      att.str= att.str,  seq.dat = dat[raw2unique, ], no.group = 1, group.label = "all",
                       verbose = verbose, catprob.parm = catprob.parm,sequential = sequential,
                       nloptr_args = nloptr_args,auglag_args=auglag_args,solnp_args = solnp_args,
                       linkfunc = LF.numeric,higher.order = higher.order, loglinear = loglinear, solver = solver,

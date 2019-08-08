@@ -47,9 +47,9 @@ inputcheck <- function(dat, Q, model, sequential,att.dist,latent.var,
   }
   if (!is.null(att.str)) {
     if (max(Q)>1) stop("Attribute structure cannot be specified if attributes are polytomous.",call. = FALSE)
-    if(any(att.dist=="higher.order")) stop("Higher-order structure is not allowed if att.str = TRUE.",call.=FALSE)
-    if(any(att.dist=="independent")) stop("Independent structure is not allowed if att.str = TRUE.",call.=FALSE)
-    if(any(att.dist=="loglinear")) stop("Loglinear structure is not allowed if att.str = TRUE.",call.=FALSE)
+    if(any(att.dist=="higher.order")) stop("Higher-order structure is not allowed when attributes are structured.",call.=FALSE)
+    if(any(att.dist=="independent")) stop("Independent structure is not allowed when attributes are structured.",call.=FALSE)
+    if(any(att.dist=="loglinear")) stop("Loglinear structure is not allowed when attributes are structured.",call.=FALSE)
     }
 
 
@@ -58,7 +58,7 @@ inputcheck <- function(dat, Q, model, sequential,att.dist,latent.var,
 }
 
 
-inputcheck.sim <- function(N, Q, gs.parm=NULL, sequential,model = "GDINA", type = "random",
+inputcheck.sim <- function(N, Q, gs.parm=NULL, sequential, model = "GDINA", type = "random",
                            catprob.parm = NULL, delta.parm = NULL)
   {
   if (!is.nonNegativeInteger(N) ) stop("N must be negative integer.",call. = FALSE)
@@ -70,6 +70,13 @@ inputcheck.sim <- function(N, Q, gs.parm=NULL, sequential,model = "GDINA", type 
   if(!is.null(catprob.parm)&&!is.list(catprob.parm)) stop("itemprob.parm must be NULL or a list.",call. = FALSE)
   if(!is.null(gs.parm)&&!is.data.frame(gs.parm)&&!is.matrix(gs.parm)) stop("gs.parm must be NULL, a matrix or data frame.",call. = FALSE)
   if(!is.null(delta.parm)&&!is.list(delta.parm)) stop("delta.parm must be NULL or a list.",call. = FALSE)
+  if(sequential){
+    if(max(rowSums(Q[,-c(1:2)]))==0)
+      stop("Some rows of the Q-matrix contain only 0s.",call. = FALSE)
+  }else{
+    if(max(rowSums(Q))==0)
+      stop("Some rows of the Q-matrix contain only 0s.",call. = FALSE)
+  }
   }
 
 model.transform <- function(model,J){

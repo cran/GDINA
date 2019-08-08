@@ -7,12 +7,13 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author" content="Wenchao Ma" />
 
-<meta name="date" content="2019-06-12" />
+<meta name="date" content="2019-08-07" />
 
 <title>A quick reference to GDINA R package</title>
 
@@ -96,7 +97,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -303,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">A quick reference to GDINA R package</h1>
 <h4 class="author">Wenchao Ma</h4>
-<h4 class="date">2019-06-12</h4>
+<h4 class="date">2019-08-07</h4>
 
 
 
@@ -311,6 +312,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <h2>What can this package do?</h2>
 <p>This package provides a framework for conducting a variety of cognitively diagnostic analyses for dichotomous and polytomous responses.</p>
 <p>For more details, see <a href="https://wenchao-ma.github.io/GDINA/index.html">here</a></p>
+<p>For an example of how to use the package, see <a href="https://wenchao-ma.github.io/GDINA/articles/OnlineExercises/CDMAnalysis_example.html">here</a></p>
 </div>
 <div id="how-to-use-this-package" class="section level2">
 <h2>How to use this package?</h2>
@@ -328,7 +330,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </div>
 <div id="a-quick-example" class="section level2">
 <h2>A quick example</h2>
-<p>Below is an illustration showing some analyses that you could do using the package. You can copy the code, paste and run it in R console.</p>
+<p>Below is an illustration showing some analyses that you could do using the package. You can copy the code, paste and run it in R console. For a more comprehensive example, see <a href="https://wenchao-ma.github.io/GDINA/articles/OnlineExercises/CDMAnalysis_example.html">this tutorial</a>.</p>
 <ol style="list-style-type: decimal">
 <li>Load the package and assume we have the following item response matrix and Q-matrix:</li>
 </ol>
@@ -383,12 +385,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <h2>More Examples</h2>
 <ul>
 <li><a href="https://wenchao-ma.github.io/GDINA/articles/OnlineExercises/GDINA_example.html">G-DINA model estimation</a></li>
+<li><a href="https://wenchao-ma.github.io/GDINA/articles/OnlineExercises/CDMAnalysis_example.html">Model estimation and diagnostics</a></li>
 <li><a href="https://wenchao-ma.github.io/GDINA/articles/OnlineExercises/LCDM_example.html">LCDM model estimation</a></li>
 <li><a href="https://wenchao-ma.github.io/GDINA/articles/OnlineExercises/HOGDINA_example.html">Higher-order GDINA model estimation</a></li>
 </ul>
 <p>If you would like to contribute an example to this website, please send me your .Rmd file.</p>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
