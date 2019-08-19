@@ -1,8 +1,8 @@
 Package: GDINA
 Type: Package
 Title: The Generalized DINA Model Framework
-Version: 2.7.0
-Date: 2019-8-8
+Version: 2.7.3
+Date: 2019-8-19
 Authors@R: c(person(given = "Wenchao",family = "Ma", role = c("aut", "cre", "cph"),email = "wenchao.ma@ua.edu"),person(given = "Jimmy", family = "de la Torre", role = c("aut","cph")), person(given="Miguel",family = "Sorrel",role = "ctb"), person(given="Zhehan",family = "Jiang",role = "ctb"))
 Description: A set of psychometric tools for cognitive diagnosis modeling based on the generalized deterministic inputs, noisy and gate (G-DINA) model by de la Torre (2011) <DOI:10.1007/s11336-011-9207-7> and its extensions, including the sequential G-DINA model by Ma and de la Torre (2016) <DOI:10.1111/bmsp.12070> for polytomous responses, and the polytomous G-DINA model by Chen and de la Torre <DOI:10.1177/0146621613479818> for polytomous attributes. Joint attribute distribution can be independent, saturated, higher-order, loglinear smoothed or structured. Q-matrix validation, item and model fit statistics, model comparison at test and item level and differential item functioning can also be conducted. A graphical user interface is also provided.
 License: GPL-3
@@ -30,7 +30,7 @@ Collate: 'CA.R' 'CR.R' 'DTM.R' 'ExportedFuncs.R' 'GDINA.R' 'GDI.R'
         'startGDINA.R' 'structuralparm.R' 'summary.GDINA.R' 'utils.R'
         'zzz.R'
 NeedsCompilation: yes
-Packaged: 2019-08-07 20:47:48 UTC; wench
+Packaged: 2019-08-19 22:08:20 UTC; wench
 Author: Wenchao Ma [aut, cre, cph],
   Jimmy de la Torre [aut, cph],
   Miguel Sorrel [ctb],
@@ -38,4 +38,4 @@ Author: Wenchao Ma [aut, cre, cph],
 Maintainer: Wenchao Ma <wenchao.ma@ua.edu>
 VignetteBuilder: knitr
 Repository: CRAN
-Date/Publication: 2019-08-08 04:40:14 UTC
+Date/Publication: 2019-08-19 23:10:02 UTC
