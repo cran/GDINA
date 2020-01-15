@@ -30,23 +30,23 @@
 #' latent groups with unique success probabilities on item \eqn{j}, where
 #' \eqn{K_j^*=\sum_{k=1}^{K}q_{jk}}.
 #'
-#' Let \eqn{\bm{\alpha}_{lj}^*} be the reduced attribute
+#' Let \eqn{\mathbf{\alpha}_{lj}^*} be the reduced attribute
 #' pattern consisting of the columns of the attributes required by item \eqn{j}, where
 #' \eqn{l=1,\ldots,2^{K_j^*}}. For example, if only the first and the last attributes are
-#' required, \eqn{\bm{\alpha}_{lj}^*=(\alpha_{l1},\alpha_{lK})}. For notational
+#' required, \eqn{\mathbf{\alpha}_{lj}^*=(\alpha_{l1},\alpha_{lK})}. For notational
 #' convenience, the first \eqn{K_j^*} attributes can be assumed to be the required attributes
-#' for item \eqn{j} as in de la Torre (2011). The probability of success \eqn{P(X_{j}=1|\bm{\alpha}_{lj}^*)} is denoted
-#' by \eqn{P(\bm{\alpha}_{lj}^*)}. To model this probability of success, different link functions
+#' for item \eqn{j} as in de la Torre (2011). The probability of success \eqn{P(X_{j}=1|\mathbf{\alpha}_{lj}^*)} is denoted
+#' by \eqn{P(\mathbf{\alpha}_{lj}^*)}. To model this probability of success, different link functions
 #' as in the generalized linear models are used in the G-DINA model. The item response
 #' function of the G-DINA model using the identity link can be written as
 #' \deqn{
-#' f[P(\bm{\alpha}_{lj}^*)]=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk}+
+#' f[P(\mathbf{\alpha}_{lj}^*)]=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk}+
 #' \sum_{k'=k+1}^{K_j^*}\sum_{k=1}^{K_j^*-1}\delta_{jkk'}\alpha_{lk}\alpha_{lk'}+\cdots+
 #' \delta_{j12{\cdots}K_j^*}\prod_{k=1}^{K_j^*}\alpha_{lk},
 #' }
 #' or in matrix form,
 #' \deqn{
-#' f[\bm{P}_j]=\bm{M}_j\bm{\delta}_j,
+#' f[\mathbf{P}_j]=\mathbf{M}_j\mathbf{\delta}_j,
 #' }
 #' where \eqn{\delta_{j0}} is the intercept for item \eqn{j}, \eqn{\delta_{jk}} is the main effect
 #' due to \eqn{\alpha_{lk}}, \eqn{\delta_{jkk'}} is the interaction effect due to
@@ -74,13 +74,13 @@
 #'        To obtain the DINA model from the G-DINA model,
 #'        all terms in identity link G-DINA model except \eqn{\delta_0} and \eqn{\delta_{12{\ldots}K_j^*}}
 #'        need to be fixed to zero, that is,
-#'        \deqn{ P(\bm{\alpha}_{lj}^*)=\delta_{j0}+\delta_{j12{\cdots}K_j^*}\prod_{k=1}^{K_j^*}\alpha_{lk}}
+#'        \deqn{ P(\mathbf{\alpha}_{lj}^*)=\delta_{j0}+\delta_{j12{\cdots}K_j^*}\prod_{k=1}^{K_j^*}\alpha_{lk}}
 #'        In this parameterization, \eqn{\delta_{j0}=g_j} and \eqn{\delta_{j0}+\delta_{j12{\cdots}K_j^*}=1-s_j}.
 #'
 #'    }
 #' \item{\code{DINO model}}{
 #'        The DINO model can be given by
-#'        \deqn{P(\bm{\alpha}_{lj}^*)=\delta_{j0}+\delta_{j1}I(\bm{\alpha}_{lj}^*\neq \bm{0})}
+#'        \deqn{P(\mathbf{\alpha}_{lj}^*)=\delta_{j0}+\delta_{j1}I(\mathbf{\alpha}_{lj}^*\neq \mathbf{0})}
 #'
 #'        where \eqn{I(\cdot)} is an indicator variable. The DINO model is also a constrained identity
 #'        link G-DINA model. As shown by de la Torre (2011), the appropriate constraint is
@@ -90,12 +90,12 @@
 #' \item{\code{Additive models with different link functions}}{
 #'        The A-CDM, LLM and R-RUM can be obtained by setting all interactions to be zero in
 #'        identity, logit and log link G-DINA model, respectively. Specifically, the A-CDM can be formulated as
-#'        \deqn{P(\bm{\alpha}_{lj}^*)=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk}.}
+#'        \deqn{P(\mathbf{\alpha}_{lj}^*)=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk}.}
 #'        The item response function for
 #'        LLM can be given by
-#'        \deqn{ logit[P(\bm{\alpha}_{lj}^*)]=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk},}
+#'        \deqn{ logit[P(\mathbf{\alpha}_{lj}^*)]=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk},}
 #'        and lastly, the RRUM, can be written as
-#'        \deqn{log[P(\bm{\alpha}_{lj}^*)]=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk}.} It should be
+#'        \deqn{log[P(\mathbf{\alpha}_{lj}^*)]=\delta_{j0}+\sum_{k=1}^{K_j^*}\delta_{jk}\alpha_{lk}.} It should be
 #'        noted that the LLM is equivalent to the compensatory RUM, which is subsumed by the GDM, and that
 #'        the RRUM is a special case of the generalized noisy inputs, deterministic ``And" gate model (G-NIDA).
 #'    }
@@ -118,7 +118,7 @@
 #' and slope parameters for attribute \eqn{k}, respectively. In the Rasch model, \eqn{\lambda_{1k}=1 \forall k};
 #' whereas in the 1PL model, a common slope parameter \eqn{\lambda_{1}} is estimated.
 #' The probability of joint attributes can be written as
-#'  \deqn{P(\strong{\alpha}|\theta_i,\strong{\lambda})=\prod_k P(\alpha_k|\theta_i,\strong{\lambda})}.
+#'  \deqn{P(\mathbf{\alpha}|\theta_i,\mathbf{\lambda})=\prod_k P(\alpha_k|\theta_i,\mathbf{\lambda})}.
 #'
 #'
 #'@section Model Estimation:
@@ -129,8 +129,8 @@
 #' adopted in M-step (Ma, Iaconangelo & de la Torre, 2016). The selection of optimization techniques mainly depends on whether
 #' some specific constraints need to be added.
 #'
-#' The sequential G-DINA model is a special case of the diagnostic tree model (DTM; Ma, in press) and estimated using
-#' the mapping matrix accordingly (See Tutz, 1997; Ma, in press).
+#' The sequential G-DINA model is a special case of the diagnostic tree model (DTM; Ma, 2019) and estimated using
+#' the mapping matrix accordingly (See Tutz, 1997; Ma, 2019).
 #'
 #'
 #' @section The Number of Parameters:
@@ -175,7 +175,7 @@
 #'    If different groups have different joint attribute distributions,
 #'    specify \code{att.dist} as a character vector with the same number of elements as the number of groups. However, if a higher-order model is used for any group,
 #'    it must be used for all groups.
-#' @param mono.constraint logical; \code{TRUE} indicates that \eqn{P(\bm{\alpha}_1) <=P(\bm{\alpha}_2)} if
+#' @param mono.constraint logical; \code{TRUE} indicates that \eqn{P(\mathbf{\alpha}_1) <=P(\mathbf{\alpha}_2)} if
 #'    for all \eqn{k}, \eqn{\alpha_{1k} < \alpha_{2k}}. Can be a vector for each item or nonzero category or a scalar which will be used for all
 #'    items to specify whether monotonicity constraint should be added.
 #' @param catprob.parm A list of initial success probability parameters for each nonzero category.
@@ -575,6 +575,22 @@
 #'
 #'####################################
 #'#           Example 6.             #
+#'# Specify initial values for item  #
+#'# parameters                       #
+#'####################################
+#'
+#'  # check initials to see the format for initial item parameters
+#'  initials <- sim10GDINA$simItempar
+#'
+#'  dat <- sim10GDINA$simdat
+#'  Q <- sim10GDINA$simQ
+#'  mod.initial <- GDINA(dat,Q,catprob.parm = initials)
+#'
+#'  # compare initial item parameters
+#'  Map(rbind, initials,extract(mod.initial,"initial.catprob"))
+#'
+#'####################################
+#'#           Example 7a.            #
 #'# Fix item and structure parameters#
 #'# Estimate person attribute profile#
 #'####################################
@@ -591,7 +607,7 @@
 #'  Map(rbind, initials,coef(mod.ini))
 #'
 #'####################################
-#'#           Example 7.             #
+#'#           Example 7b.            #
 #'#   Fix parameters for some items  #
 #'# Estimate person attribute profile#
 #'####################################

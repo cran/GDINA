@@ -35,7 +35,7 @@ vcov.GDINA <- function(object,...){
   nm <- names(dn)
   v.names <- NULL
   for(j in seq_len(length(dn))) v.names <- c(v.names,paste(nm[j],dn[[j]]))
-  opg <- OPG_d(object,SE.type = 2)$cov
+  opg <- OPG_d(object,...)$cov
   rownames(opg) <- colnames(opg) <- v.names
   opg
   }
