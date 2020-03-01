@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Wenchao Ma" />
 
-<meta name="date" content="2020-01-15" />
+<meta name="date" content="2020-03-01" />
 
 <title>A quick reference to GDINA R package</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">A quick reference to GDINA R package</h1>
 <h4 class="author">Wenchao Ma</h4>
-<h4 class="date">2020-01-15</h4>
+<h4 class="date">2020-03-01</h4>
 
 
 
@@ -318,6 +316,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <ul>
 <li>To estimate various CDMs, use <strong>GDINA()</strong> function</li>
 <li>To extract item and person parameters from GDINA estimates, use <strong>coef()</strong> and <strong>personparm()</strong> functions, respectively</li>
+<li>To extract other estimation components, use <strong>extract()</strong> function</li>
 <li>To evaluate absolute model fit, use <strong>modelfit()</strong> or <strong>itemfit()</strong> functions</li>
 <li>To evaluate relative model fit, use <strong>AIC()</strong>, <strong>BIC()</strong> or <strong>deviance()</strong> functions</li>
 <li>To validate Q-matrix, use <strong>Qval()</strong> function</li>
