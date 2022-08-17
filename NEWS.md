@@ -1,3 +1,11 @@
+# GDINA 2.9.3
+* Change     - update `simGDINA` to handle CDMs with attribute structures
+* Added     - add an argument `SE` for MCmodel function
+* Added     - add nloptr for optimization
+* Added     - SISM model is available using the `GDINA` function and `simGDINA` function
+* Change    - BUG-DINO model was revised in the `GDINA` function
+* Change    - examples
+
 # GDINA 2.8.8
 * Change    - update the package to remove the dependence on nloptr package
 

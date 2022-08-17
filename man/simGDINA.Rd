@@ -13,8 +13,11 @@ simGDINA(
   catprob.parm = NULL,
   model = "GDINA",
   sequential = FALSE,
+  no.bugs = 0,
   gs.args = list(type = "random", mono.constraint = TRUE),
-  delta.args = list(design.matrix = NULL, linkfunc = NULL),
+  design.matrix = NULL,
+  linkfunc = NULL,
+  att.str = NULL,
   attribute = NULL,
   att.dist = "uniform",
   item.names = NULL,
@@ -64,6 +67,8 @@ options \code{design.matrix} and \code{linkfunc} in argument \code{delta.args}.}
 \item{sequential}{logical; \code{TRUE} if the sequential model is used for polytomous responses simulation, and \code{FALSE}
 if there is no polytomously scored items.}
 
+\item{no.bugs}{the number of bugs (or misconceptions) for the \code{SISM} model. Note that bugs must be given in the last no.bugs columns.}
+
 \item{gs.args}{a list of options when \code{gs.parm} is specified. It consists of two components:
 \itemize{
      \item \code{type} How are the delta parameters for ACDM, LLM, RRUM generated?
@@ -76,14 +81,13 @@ if there is no polytomously scored items.}
    are always satisfied and therefore this argument is ignored.
    }}
 
-\item{delta.args}{a list of options when \code{delta.parm} is specified. It consists of two components:
-\itemize{
-     \item \code{linkfunc} a vector of link functions for each item/category; It can be \code{"identity"},\code{"log"} or \code{"logit"}. Only necessary
-   when, for some items, \code{model="UDF"}.
-    \item \code{design.matrix} a list of design matrices; Its length must be equal to the number of items (or nonzero categories for sequential models).
-   If CDM for item j is specified as "UDF" in argument \code{model}, the corresponding design matrix must be provided; otherwise, the design matrix can be \code{NULL},
-   which will be generated automatically.
-   }}
+\item{design.matrix}{a list of design matrices; Its length must be equal to the number of items (or nonzero categories for sequential models).}
+
+\item{linkfunc}{a vector of link functions for each item/category; It can be \code{"identity"},\code{"log"} or \code{"logit"}. Only applicable when
+when \code{delta.parm} or \code{catprob.parm} are provided.}
+
+\item{att.str}{attribute structure. \code{NULL}, by default, means there is no structure. Attribute structure needs be specified as a list -
+which will be internally handled by \code{att.structure} function. It can also be a matrix giving all permissible attribute profiles.}
 
 \item{attribute}{optional user-specified person attributes. It is a \eqn{N\times K} matrix or data frame. If this is not supplied, attributes are simulated
 from a distribution specified in \code{att.dist}.}
@@ -264,7 +268,7 @@ extract(sim,what = "dat")
 extract(sim,what = "attribute")
 
 ####################################################
-#                   Example 5                      #
+#                   Example 5a                     #
 #          Data simulation (all CDMs)              #
 #  using probability of success in list format     #
 ####################################################
@@ -295,9 +299,24 @@ Q <- sim10GDINA$simQ
 # it is not necessary to specify model and type
 sim <- simGDINA(N,Q,catprob.parm = itemparm.list)
 
+####################################################
+#                   Example 5b                     #
+#          Data simulation (all CDMs)              #
+#  using probability of success in list format     #
+#  attribute has a linear structure                #
+####################################################
+
+est <- GDINA(sim10GDINA$simdat,sim10GDINA$simQ,att.str = list(c(1,2),c(2,3)))
+# design matrix
+# link function
+# item probabilities
+ip <- extract(est,"itemprob.parm")
+sim <- simGDINA(N=500,sim10GDINA$simQ,catprob.parm = ip,
+design.matrix = dm,linkfunc = lf,att.str = list(c(1,2),c(2,3)))
+
 
 ####################################################
-#                   Example 6                      #
+#                   Example 6a                     #
 #            Data simulation (all CDMs)            #
 #      using delta parameters in list format       #
 ####################################################
@@ -316,10 +335,21 @@ delta.list <- list(c(0.2,0.7),
 model <- c("GDINA","GDINA","GDINA","DINA","DINO","GDINA","ACDM","LLM","RRUM","GDINA")
 N <- 500
 Q <- sim10GDINA$simQ
-# When simulating using delta.parm argument, model needs to be
-# specified
 sim <- simGDINA(N,Q,delta.parm = delta.list, model = model)
+####################################################
+#                   Example 6b                     #
+#          Data simulation (all CDMs)              #
+#  using delta parameters in list format           #
+#  attribute has a linear structure                #
+####################################################
 
+est <- GDINA(sim10GDINA$simdat,sim10GDINA$simQ,att.str = list(c(1,2),c(2,3)))
+# design matrix
+# link function
+# item probabilities
+ip <- extract(est,"delta.parm")
+sim <- simGDINA(N=500,sim10GDINA$simQ,delta.parm =  d,
+design.matrix = dm,linkfunc = lf,att.str = list(c(1,2),c(2,3)))
 
 ####################################################
 #                   Example 7                      #
@@ -497,6 +527,55 @@ d <- list(
   set.seed(12345)
 sim <- simGDINA(N=1000,Q = Q, delta.parm = d,
                model = c("MSDINA","MSDINA","DINA","DINA","DINA","MSDINA","MSDINA"))
+
+# simulated data
+extract(sim,what = "dat")
+
+# simulated attributes
+extract(sim,what = "attribute")
+
+
+##############################################################
+#                   Example 15
+#  reparameterized SISM model (Kuo, Chen, & de la Torre, 2018)
+#  see GDINA function for more details
+###############################################################
+
+# The Q-matrix used in Kuo, et al (2018)
+# The first four columns are for Attributes 1-4
+# The last three columns are for Bugs 1-3
+Q <- matrix(c(1,0,0,0,0,0,0,
+0,1,0,0,0,0,0,
+0,0,1,0,0,0,0,
+0,0,0,1,0,0,0,
+0,0,0,0,1,0,0,
+0,0,0,0,0,1,0,
+0,0,0,0,0,0,1,
+1,0,0,0,1,0,0,
+0,1,0,0,1,0,0,
+0,0,1,0,0,0,1,
+0,0,0,1,0,1,0,
+1,1,0,0,1,0,0,
+1,0,1,0,0,0,1,
+1,0,0,1,0,0,1,
+0,1,1,0,0,0,1,
+0,1,0,1,0,1,1,
+0,0,1,1,0,1,1,
+1,0,1,0,1,1,0,
+1,1,0,1,1,1,0,
+0,1,1,1,1,1,0),ncol = 7,byrow = TRUE)
+
+J <- nrow(Q)
+N <- 500
+gs <- data.frame(guess=rep(0.1,J),slip=rep(0.1,J))
+
+sim <- simGDINA(N,Q,gs.parm = gs,model = "SISM",no.bugs=3)
+
+# True item success probabilities
+extract(sim,what = "catprob.parm")
+
+# True delta parameters
+extract(sim,what = "delta.parm")
 
 # simulated data
 extract(sim,what = "dat")

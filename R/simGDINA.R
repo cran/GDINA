@@ -78,14 +78,11 @@
 #'    this is applicable only for the G-DINA model when \code{gs.parm} is used. For ACDM, LLM and RRUM, monotonicity constraints
 #'    are always satisfied and therefore this argument is ignored.
 #'    }
-#' @param delta.args a list of options when \code{delta.parm} is specified. It consists of two components:
-#' \itemize{
-#'      \item \code{linkfunc} a vector of link functions for each item/category; It can be \code{"identity"},\code{"log"} or \code{"logit"}. Only necessary
-#'    when, for some items, \code{model="UDF"}.
-#'     \item \code{design.matrix} a list of design matrices; Its length must be equal to the number of items (or nonzero categories for sequential models).
-#'    If CDM for item j is specified as "UDF" in argument \code{model}, the corresponding design matrix must be provided; otherwise, the design matrix can be \code{NULL},
-#'    which will be generated automatically.
-#'    }
+#' @param linkfunc a vector of link functions for each item/category; It can be \code{"identity"},\code{"log"} or \code{"logit"}. Only applicable when
+#'    when \code{delta.parm} or \code{catprob.parm} are provided.
+#' @param design.matrix a list of design matrices; Its length must be equal to the number of items (or nonzero categories for sequential models).
+#' @param att.str attribute structure. \code{NULL}, by default, means there is no structure. Attribute structure needs be specified as a list -
+#'    which will be internally handled by \code{att.structure} function. It can also be a matrix giving all permissible attribute profiles.
 #' @param item.names A vector giving the name of items or categories. If it is \code{NULL} (default), items are named as "Item 1", "Item 2", etc.
 #' @param attribute optional user-specified person attributes. It is a \eqn{N\times K} matrix or data frame. If this is not supplied, attributes are simulated
 #'    from a distribution specified in \code{att.dist}.
@@ -106,6 +103,7 @@
 #'    specifying the mean of multivariate normal distribution; and \code{sigma} is a positive-definite
 #'    symmetric matrix specifying the variance-covariance matrix. \code{cutoffs} is a vector giving the
 #'    cutoff for each attribute. See \code{Examples}.
+#' @param no.bugs the number of bugs (or misconceptions) for the \code{SISM} model. Note that bugs must be given in the last no.bugs columns.
 #' @param digits How many decimal places in each number? The default is 4.
 #' @return an object of class \code{simGDINA}. Elements that can be extracted using method \code{extract}
 #' include:
@@ -243,7 +241,7 @@
 #'extract(sim,what = "attribute")
 #'
 #'####################################################
-#'#                   Example 5                      #
+#'#                   Example 5a                     #
 #'#          Data simulation (all CDMs)              #
 #'#  using probability of success in list format     #
 #'####################################################
@@ -274,9 +272,26 @@
 #' # it is not necessary to specify model and type
 #'sim <- simGDINA(N,Q,catprob.parm = itemparm.list)
 #'
+#'####################################################
+#'#                   Example 5b                     #
+#'#          Data simulation (all CDMs)              #
+#'#  using probability of success in list format     #
+#'#  attribute has a linear structure                #
+#'####################################################
+#'
+#'est <- GDINA(sim10GDINA$simdat,sim10GDINA$simQ,att.str = list(c(1,2),c(2,3)))
+#'# design matrix
+# dm <- extract(est,"designmatrix")
+#'# link function
+# lf <- extract(est,"linkfunc")
+#'# item probabilities
+#'ip <- extract(est,"itemprob.parm")
+#'sim <- simGDINA(N=500,sim10GDINA$simQ,catprob.parm = ip,
+#'design.matrix = dm,linkfunc = lf,att.str = list(c(1,2),c(2,3)))
+#'
 #'
 #'####################################################
-#'#                   Example 6                      #
+#'#                   Example 6a                     #
 #'#            Data simulation (all CDMs)            #
 #'#      using delta parameters in list format       #
 #'####################################################
@@ -295,10 +310,23 @@
 #' model <- c("GDINA","GDINA","GDINA","DINA","DINO","GDINA","ACDM","LLM","RRUM","GDINA")
 #' N <- 500
 #' Q <- sim10GDINA$simQ
-#' # When simulating using delta.parm argument, model needs to be
-#' # specified
 #' sim <- simGDINA(N,Q,delta.parm = delta.list, model = model)
+#'####################################################
+#'#                   Example 6b                     #
+#'#          Data simulation (all CDMs)              #
+#'#  using delta parameters in list format           #
+#'#  attribute has a linear structure                #
+#'####################################################
 #'
+#'est <- GDINA(sim10GDINA$simdat,sim10GDINA$simQ,att.str = list(c(1,2),c(2,3)))
+#'# design matrix
+# dm <- extract(est,"designmatrix")
+#'# link function
+# lf <- extract(est,"linkfunc")
+#'# item probabilities
+#'ip <- extract(est,"delta.parm")
+#'sim <- simGDINA(N=500,sim10GDINA$simQ,delta.parm =  d,
+#'design.matrix = dm,linkfunc = lf,att.str = list(c(1,2),c(2,3)))
 #'
 #'####################################################
 #'#                   Example 7                      #
@@ -482,13 +510,62 @@
 #'
 #'# simulated attributes
 #'extract(sim,what = "attribute")
+#'
+#'
+#' ##############################################################
+#'#                   Example 15
+#'#  reparameterized SISM model (Kuo, Chen, & de la Torre, 2018)
+#'#  see GDINA function for more details
+#'###############################################################
+#'
+#' # The Q-matrix used in Kuo, et al (2018)
+#' # The first four columns are for Attributes 1-4
+#' # The last three columns are for Bugs 1-3
+#' Q <- matrix(c(1,0,0,0,0,0,0,
+#' 0,1,0,0,0,0,0,
+#' 0,0,1,0,0,0,0,
+#' 0,0,0,1,0,0,0,
+#' 0,0,0,0,1,0,0,
+#' 0,0,0,0,0,1,0,
+#' 0,0,0,0,0,0,1,
+#' 1,0,0,0,1,0,0,
+#' 0,1,0,0,1,0,0,
+#' 0,0,1,0,0,0,1,
+#' 0,0,0,1,0,1,0,
+#' 1,1,0,0,1,0,0,
+#' 1,0,1,0,0,0,1,
+#' 1,0,0,1,0,0,1,
+#' 0,1,1,0,0,0,1,
+#' 0,1,0,1,0,1,1,
+#' 0,0,1,1,0,1,1,
+#' 1,0,1,0,1,1,0,
+#' 1,1,0,1,1,1,0,
+#' 0,1,1,1,1,1,0),ncol = 7,byrow = TRUE)
+#'
+#' J <- nrow(Q)
+#' N <- 500
+#'gs <- data.frame(guess=rep(0.1,J),slip=rep(0.1,J))
+#'
+#'sim <- simGDINA(N,Q,gs.parm = gs,model = "SISM",no.bugs=3)
+#'
+#'# True item success probabilities
+#'extract(sim,what = "catprob.parm")
+#'
+#'# True delta parameters
+#'extract(sim,what = "delta.parm")
+#'
+#'# simulated data
+#'extract(sim,what = "dat")
+#'
+#'# simulated attributes
+#'extract(sim,what = "attribute")
 #'}
 #'
 #'
 simGDINA <- function(N, Q, gs.parm = NULL, delta.parm = NULL, catprob.parm = NULL,
-                     model = "GDINA", sequential = FALSE,
+                     model = "GDINA", sequential = FALSE, no.bugs = 0,
                      gs.args = list(type = "random",mono.constraint = TRUE),
-                     delta.args = list(design.matrix = NULL, linkfunc = NULL),
+                     design.matrix = NULL, linkfunc = NULL,att.str = NULL,
                       attribute = NULL, att.dist = "uniform", item.names = NULL,
                       higher.order.parm=list(theta = NULL, lambda = NULL),
                       mvnorm.parm=list(mean = NULL,sigma = NULL,cutoffs = NULL),
@@ -519,6 +596,11 @@ simGDINA <- function(N, Q, gs.parm = NULL, delta.parm = NULL, catprob.parm = NUL
       Q <- Q[-loc, ]
       model <- model[-loc]
     }
+  }else if (any(model==7)){
+    no.bugs <- ncol(Q)
+  }else if (any(model == 8)){
+    if(no.bugs==0)
+      warning("The number of bugs is zero for SISM?",call. = FALSE)
   }
   # rule: 0 -> saturated model; 1 ->DINA; 2 ->DINO; 3 ->additive model; 4 ->MS-DINA; -1 -> UDF
   rule <- model2rule(model)
@@ -536,14 +618,28 @@ simGDINA <- function(N, Q, gs.parm = NULL, delta.parm = NULL, catprob.parm = NUL
   }
   J <- nrow(Q)
   K <- ncol(Q)
-  pattern <- attributepattern(Q = Q)
-  pattern.t <- t(pattern)
+  # pattern <- attributepattern(Q = Q)
+  # pattern.t <- t(pattern)
+Q <- as.matrix(Q)
 
-  L <- nrow(pattern)  # the number of latent groups
-  Kj <- rowSums(Q>0)  # The number of attributes for each item
-  Kjmax <- max(Kj) # the maximum attributes required for each item
-  catprob.matrix <- matrix(NA,J,2^Kjmax)
-  par.loc <- eta(as.matrix(Q))
+  if(is.null(att.str)){ # no structure
+    pattern <- as.matrix(att.structure(hierarchy.list = att.str,K = K,Q = Q,att.prob="uniform")$`att.str`)
+    par.loc <- eta(Q)  #J x L
+    reduced.LG <- item_latent_group(Q)
+  }else if(is.matrix(att.str)){
+    pattern <- att.str
+    par.loc <- eta(Q, pattern)  #J x L
+    reduced.LG <- item_latent_group(Q, pattern)
+  }else{
+    pattern <- as.matrix(att.structure(hierarchy.list = att.str,K = K,Q = Q,att.prob="uniform")$`att.str`)
+    par.loc <- eta(Q, pattern)  #J x L
+    reduced.LG <- item_latent_group(Q, pattern)
+  }
+  L <- nrow(pattern)  # The number of latent classes
+  Lj <- sapply(reduced.LG,nrow)
+  Kj <- rowSums(Q > 0)
+  catprob.matrix <- matrix(NA,J,max(Lj))
+
 
 ######################################################################################
   #
@@ -557,24 +653,30 @@ if (!is.null(gs.parm)) {
   if (length(gs.args$mono.constraint)==1)  gs.args$mono.constraint <- rep(gs.args$mono.constraint,J)
   if(nrow(gs.parm)!=nrow(Q)) stop("The number of rows in gs is not equal to the number of items (or non-zero categories).",call. = FALSE)
   if(any(1-rowSums(gs.parm)<0)) stop("Data cannot be simulated because 1-s-g<0 for some items - check your parameters or specify parameters using delta.parm or catprob.parm.",call. = FALSE)
-  pd <- gs2p(Q=Q,gs=gs.parm,model=model,type=gs.args$type,mono.constraint=gs.args$mono.constraint,digits=8)
+  if(!is.null(att.str)) stop("delta.parm should be used with models with attribute structures.",call. = FALSE)
+  pd <- gs2p(Q=Q,gs=gs.parm,model=model,no.bugs=no.bugs,type=gs.args$type,mono.constraint=gs.args$mono.constraint,digits=8)
   delta.parm <- pd$delta.parm
   catprob.parm <- pd$itemprob.parm
   catprob.matrix <- pd$itemprob.matrix
 }else if(!is.null(delta.parm))
   {
-  myd.args <- list(design.matrix = NULL, linkfunc = NULL)
-  delta.args <- modifyList(myd.args, delta.args)
+  # myd.args <- list(design.matrix = NULL, linkfunc = NULL)
+  # delta.args <- modifyList(myd.args, delta.args)
   catprob.parm <- vector("list",J)
 
   # identitiy link -> 1
   # logit link -> 2
   # log link -> 3
-  LF.numeric <- linkf.numeric(linkfunc = delta.args$linkfunc, model.vector = model)
+  if (is.null(linkfunc)){
+    LF.numeric <- model2linkfunc(model)
+  }else{
+    LF.numeric <- linkf.numeric(linkfunc,model)
+  }
 
 
-  if(is.null(delta.args$design.matrix)){
-    if(any(model==-1)) stop("design.matrix must be provided for user-defined models.",call. = FALSE)
+
+  if(is.null(design.matrix)){
+    if(any(model==-1)||!is.null(att.str)) stop("design.matrix must be provided for user-defined models.",call. = FALSE)
     design.matrix <-  vector("list",J)
     for(j in seq_len(J)) {
       if(model[j]==6){
@@ -584,19 +686,18 @@ if (!is.null(gs.parm)) {
       }
     }
 
-  }else if(length(delta.args$design.matrix)!=J){
+  }else if(length(design.matrix)!=J){
     stop("length of design matrix is not correctly specified.",call. = FALSE)
-  }else{
-    design.matrix <- delta.args$design.matrix
   }
 
     for (j in 1:J){
       catprob.matrix[j,1:nrow(design.matrix[[j]])] <-
         catprob.parm[[j]] <-
-        round(c(Calc_Pj(par = delta.parm[[j]],designMj = design.matrix[[j]], linkfunc = LF.numeric[j])),digits)
-      if(any(catprob.parm[[j]]<0)||any(catprob.parm[[j]]>1)) stop("Calculated success probabilities from delta parameters cross the boundaries.",call. = FALSE)
+        round(c(Calc_Pj(par = as.matrix(delta.parm[[j]]),designMj = as.matrix(design.matrix[[j]]), linkfunc = LF.numeric[j])),digits)
+      if(any(catprob.parm[[j]]<0)||any(catprob.parm[[j]]>1))
+        stop("Calculated success probabilities from delta parameters cross the boundaries.",call. = FALSE)
 
-      names(catprob.parm[[j]]) <- paste("P(",apply(attributepattern(Kj[j]),1,paste,collapse = ""),")",sep = "")
+      names(catprob.parm[[j]]) <- paste("P(",apply(reduced.LG[[j]],1,paste,collapse = ""),")",sep = "")
     }
   delta.parm <- format_delta(delta.parm,model,Kj,digits=digits)
   }else if(!is.null(catprob.parm)){
@@ -604,9 +705,10 @@ if (!is.null(gs.parm)) {
 
       for (j in 1:J){
         catprob.matrix[j,1:length(catprob.parm[[j]])] <- round(c(catprob.parm[[j]]),digits)
-        Mj <- designmatrix(Kj[j],model[j])
+
+        if(is.null(design.matrix)) Mj <- designmatrix(Kj[j],model[j]) else Mj <- design.matrix[[j]]
         delta.parm[[j]] <- round(c(solve(t(Mj)%*%Mj)%*%t(Mj)%*%c(catprob.parm[[j]])),digits)
-        names(catprob.parm[[j]]) <- paste("P(",apply(attributepattern(Kj[j]),1,function(x){paste(x,collapse = "")}),")",sep = "")
+        names(catprob.parm[[j]]) <- paste("P(",apply(reduced.LG[[j]],1,paste,collapse = ""),")",sep = "")
       }
     delta.parm <- format_delta(delta.parm,model,Kj,digits=digits)
     }
@@ -643,7 +745,7 @@ if (!is.null(gs.parm)) {
       att.group <- matchMatrix(pattern,att)
       # att.group <- apply(att, 1, function(x) which.max(colSums(x==pattern.t)))
     }else if (tolower(att.dist) == "mvnorm"){
-      if (is.null(mvnorm.parm$mean)||is.null(mvnorm.parm$sigma||is.null(mvnorm.parm$cutoffs)))
+      if (is.null(mvnorm.parm$mean)||is.null(mvnorm.parm$sigma)||is.null(mvnorm.parm$cutoffs))
       {
         stop("multivariate normal parameters must be provided.",call. = FALSE)
       }
@@ -652,7 +754,7 @@ if (!is.null(gs.parm)) {
         att <- 1*(atts>matrix(mvnorm.parm$cutoffs,nrow = N,ncol = length(mvnorm.parm$cutoffs),byrow = TRUE))
         # Calculate which latent group each examinee belongs to return a vector
         # of N elements ranging from 1 to 2^K
-        att.group <- apply(att, 1, function(x) which.max(colSums(x==pattern.t)))
+        att.group <- apply(att, 1, function(x) which.max(colSums(x==t(pattern))))
       }else{
         # if Q matrix is polytomous, cutoffs must be a list - each for one attribute
         stop("multivariate normal distribution is only available for dichotomous attributes.",call. = FALSE)
