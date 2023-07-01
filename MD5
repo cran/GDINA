@@ -1,6 +1,6 @@
-49303b2dd4ea94aa30e04599f7b6de33 *DESCRIPTION
+15ccfb801eb5031914ac929988f67c91 *DESCRIPTION
 e6f918b3a65fe8c3775bc190b913c5bb *NAMESPACE
-bfdf2a973a210c61a750bb2d85b9288b *NEWS.md
+003ecdf8cb8c56d8ab24a7e55232ae25 *NEWS.md
 17c863b50eff8ed2d9af122b2fdb9b25 *R/CA.R
 2ac4d821a6080de2dadac4df3d515256 *R/CR.R
 808041b97fc00a58cef7ef761f33066e *R/DTM.R
@@ -28,7 +28,7 @@ e813a000415de6ea1ef53c705edfc895 *R/anova.GDINA.R
 cacba4c06894e43a16754eb84a308be6 *R/frac20.R
 c8a99a517a62e381bfb404d5ac15616e *R/itemfit.R
 f88b8c322cc8f01f991a9b157360384a *R/itemparm.GDINA.R
-655db970f8582f570b080e793f24765d *R/modelcomp.R
+9965814d0604b8c9c62d408d20dc66b6 *R/modelcomp.R
 4d91d88865636728efc2eb502525596a *R/monocheck.R
 91ee7bb4dee94508b3e49cc3fc2fbe99 *R/personparm.GDINA.R
 feff048ef0faaed0bb28e12c742c0806 *R/plotIRF.GDINA.R
@@ -47,10 +47,10 @@ b7154b49d71a3a3df504081277dd09f9 *R/sim30DINA.R
 75c947bcf7af1a1647099648c76a3d29 *R/startGDINA.R
 b2b62f0e857e71ba1e3b20a85bdd56f9 *R/structuralparm.R
 a36cdaac0b27ca15846f801c9867b130 *R/summary.GDINA.R
-b1ffd72976588db612f256d52bbd2ada *R/utils.R
+3178293090cdba36786134d549e8d7c5 *R/utils.R
 c8cfe1868abdf403a3cdf7e1e34070b6 *R/zzz.R
 dc4183749c8def9f5d5b3705054fe61b *README.md
-0e2a7d8bfada49eedb2307d486567b88 *build/vignette.rds
+c76e90dec9a0775a5ae7adf91fae1444 *build/vignette.rds
 cf91b76a1f9e9d0d6bacc13d20181112 *data/ecpe.rda
 5f5ae1cb63421eb28caa0305507d0186 *data/frac20.rda
 149cc8e60eedc218ffd686cd471fc8d3 *data/sim10GDINA.rda
@@ -64,7 +64,7 @@ ea018711262faa6c8d53142a256df134 *data/sim30pGDINA.rda
 ac6d0588352cb303627b088c5f36a629 *inst/CITATION
 e5ac0f8b576f30bd5abad7d90c063d63 *inst/doc/GDINA.R
 f5d8f9dbbe247d20db27d7d1863e8ee3 *inst/doc/GDINA.Rmd
-1e29a13c70c46fa409b40629f5dd7c2d *inst/doc/GDINA.html
+74d281aa2bb6e006b2643b941bd1f808 *inst/doc/GDINA.html
 eeae729405a2b0578600f87fcd1b4843 *inst/shiny/Data.csv
 87f670886f421aa439c3142a4dea43c6 *inst/shiny/rsconnect/shinyapps.io/wenchaoma/GDINA.dcf
 6cbd54d9502436d315460df8cf183e59 *inst/shiny/server.R
@@ -94,7 +94,7 @@ a2b2c4c49284dd9248296da7ef5245cd *man/indlogLik.Rd
 ce068e6076f3ef5974b130a7325ab967 *man/indlogPost.Rd
 8a4350b82fa1ef073fb33a447ab56390 *man/itemfit.Rd
 b1b7fe5e516e70b3a86d06f193d6dccc *man/itemparm.Rd
-5220b44ad4454b4f6c6d494a55ce1869 *man/modelcomp.Rd
+0ff7cbe4cece08f1be2ecfe273eb27ac *man/modelcomp.Rd
 da9e84afede5aa57e944751c2918caf3 *man/modelfit.Rd
 e8407462335e7a989543799922c90a88 *man/monocheck.Rd
 f47239d620344da669fa4bc3400cd48d *man/npar.Rd
