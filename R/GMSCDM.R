@@ -7,7 +7,7 @@
 #' the strategy number. See examples.
 #' @param model CDM used; can be \code{"DINA"},\code{"DINO"},\code{"ACDM"},\code{"LLM"}, and \code{"RRUM"}, representing
 #' the GMS-DINA, GMS-DINO, GMS-ACDM, GMS-LLM and GMS-RRUM in Ma & Guo (2019), respectively. It can also be \code{"rDINA"} and \code{"rDINO"},
-#' representing restricted GMS-DINA and GMS-DINO models where delta_{jm1} are equal for all strategies. Note that only a single model can be used
+#' representing restricted GMS-DINA and GMS-DINO models where \eqn{\delta_{jm1}} are equal for all strategies. Note that only a single model can be used
 #' for the whole test.
 #' @param s strategy selection parameter. It is equal to 1 by default.
 #' @param att.prior mixing proportion parameters.
@@ -24,7 +24,7 @@
 #' \item{pjmc}{Probability of adopting each strategy on each item for each latent class}
 #' \item{sprv}{Strategy pravelence}
 #' }
-#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu}}
+#' @author Wenchao Ma, The University of Minnesota, \email{wma@umn.edu}
 #'
 #' @seealso \code{\link{GDINA}} for MS-DINA model and single strategy CDMs,
 #' and \code{\link{DTM}} for diagnostic tree model for multiple strategies in polytomous response data

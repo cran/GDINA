@@ -9,7 +9,7 @@
 #' @param CI numeric value from 0 to 1 indicating the range of the confidence interval for RMSEA. Default returns the 90\% interval.
 #' @param ItemOnly should joint attribute distribution parameters be considered? Default = FALSE. See Ma (2019).
 #'
-#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu}}
+#' @author Wenchao Ma, The University of Minnesota, \email{wma@umn.edu}
 #' @export
 #' @references
 #'
@@ -65,7 +65,7 @@ modelfit <- function(GDINA.obj, CI = 0.90, ItemOnly = FALSE)
   pf <- extract(GDINA.obj, "LCpf.parm") # S(Xi=s|alpha) S x L without category 0
 
   # Observed p
-  crossp <- crossprod.na(dat, dat, val = 0) / crossprod(!is.na(dat), !is.na(dat))
+  crossp <- crossprod_na(dat, dat, val = 0) / crossprod(!is.na(dat), !is.na(dat))
   # univariate and bivariate observed
   # length of nitems + nitems*(nitems-1)/2
   p <- c(colMeans(dat, na.rm = TRUE), crossp[lower.tri(crossp)])

@@ -9,6 +9,7 @@ MCmodel(
   Qc,
   model = "MCDINA",
   key = NULL,
+  group = NULL,
   conv.crit = 0.001,
   maxitr = 2000,
   conv.type = "pr",
@@ -32,6 +33,9 @@ allow to assign examinees uniquely.}
 
 \item{key}{a numeric vector giving the key of each item. See \code{Examples}.
 \code{NULL} by default indicating the coded category requiring the largest number of 1s is the key.}
+
+\item{group}{Group membership vector if a multiple group model is considered. It must only contain whole numbers and start from 1. The
+length must be equal to the number of rows of the data.}
 
 \item{conv.crit}{The convergence criterion for max absolute change in \code{conv.type} for two consecutive iterations.}
 
@@ -94,7 +98,7 @@ This function estimates the multiple-choice DINA model (de la Torre, 2009).
  # Note item 1 below: category 1 is the key (as indicated in the key argument below)
  # The distractor (category 4) involves an attribute not included by the key option
 
- Qc <- matrix(c(1,	1,	1,	1,	0,
+ Qc <- matrix(c(1,	1,	0,	1,	1,
                 1,	2,	0,	1,	0,
                 1,	3,	1,	0,	0,
                 1,	4,	1,	0,	1,
@@ -118,6 +122,15 @@ This function estimates the multiple-choice DINA model (de la Torre, 2009).
  est2$prob.parm
  est2$testfit
  est2$attribute
+
+
+ ###############################
+ # a multiple group model
+ ###############################
+est <- MCmodel(sim10MCDINA$simdat, sim10MCDINA$simQ, group = rep(1:2, 1500))
+# log posterior of different groups
+est$lik$logprior
+
 }
 }
 \references{
@@ -129,5 +142,5 @@ Ma, W., & de la Torre, J. (2020). GDINA: An R Package for Cognitive Diagnosis Mo
 \code{\link{GDINA}} for G-DINA model
 }
 \author{
-{Wenchao Ma, The University of Alabama, \email{wenchao.ma@ua.edu}}
+Wenchao Ma, The University of Minnesota, \email{wma@umn.edu}
 }

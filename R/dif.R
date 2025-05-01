@@ -7,6 +7,7 @@
 #' @param dat item responses from two groups; missing data need to be coded as \code{NA}
 #' @param Q Q-matrix specifying the association between items and attributes
 #' @param model model for each item.
+#' @param sequential Logical; whether a sequential model is fit to the data. Default is \code{FALSE}.
 #' @param group a factor or a vector indicating the group each individual belongs to. Its length must be equal to the number of individuals.
 #' @param method DIF detection method; It can be \code{"wald"} for Hou, de la Torre, and Nandakumar's (2014)
 #' Wald test method, and \code{"LR"} for likelihood ratio test (Ma, Terzi, Lee,& de la Torre, 2017).
@@ -29,7 +30,8 @@
 #' @param ... arguments passed to GDINA function for model calibration
 #' @return A data frame giving the Wald statistics and associated p-values.
 #'
-#' @author {Wenchao Ma, The University of Alabama, \email{wenchao.ma@@ua.edu} \cr Jimmy de la Torre, The University of Hong Kong}
+#' @author Wenchao Ma, The University of Minnesota, \email{wma@umn.edu}
+#'  Jimmy de la Torre, The University of Hong Kong
 #' @seealso \code{\link{GDINA}}
 #' @export
 #' @examples
@@ -66,8 +68,19 @@
 #'
 
 
-dif <- function(dat, Q, group, model = "GDINA", method = "wald", anchor.items = NULL, dif.items = "all", p.adjust.methods = "holm", approx = FALSE,
+dif <- function(dat, Q, group, model = "GDINA", sequential = FALSE, method = "wald", anchor.items = NULL, dif.items = "all", p.adjust.methods = "holm", approx = FALSE,
                 SE.type = 2, FS.args = list(on = FALSE, alpha.level = .05, maxit = 10, verbose = FALSE),...){
+
+  if(sequential){
+    dat <- seq_coding(dat, Q)
+    originalQ <- Q
+    Q <- Q[,-c(1, 2)]
+    all.item.names <- paste("Item", originalQ[, 1], "Cat", originalQ[, 2])
+  }else{
+    all.item.names <- paste("Item", seq(nrow(Q)))
+  }
+
+
 
   if (!is.matrix(dat))
     dat <- as.matrix(dat)
@@ -116,7 +129,7 @@ dif <- function(dat, Q, group, model = "GDINA", method = "wald", anchor.items = 
       log.purification <- x$log
       output <- as.data.frame(output)
       colnames(output) <- c("Wald stat.","df","p.value")
-      rownames(output) <- paste("Item",seq_len(J))
+      rownames(output) <- all.item.names
 
       }else{
 
@@ -147,7 +160,7 @@ dif <- function(dat, Q, group, model = "GDINA", method = "wald", anchor.items = 
 
       output <- as.data.frame(output)
       colnames(output) <- c("Wald stat.","df","p.value")
-      rownames(output) <- paste("Item",dif.items)
+      rownames(output) <- all.item.names[dif.items]
       }
 
 
@@ -167,7 +180,7 @@ dif <- function(dat, Q, group, model = "GDINA", method = "wald", anchor.items = 
         it <- it + 1
         log.purification[[it]] <- output
         if(FS.args$verbose){
-          cat("Iter = ", it,"Anchor items = Items ",anchor.items,"\n")
+          cat("Iter = ", it,"Anchor items =  ",all.item.names[anchor.items],"\n")
           # rownames(output) <- paste("Item",seq_len(J))
           print(output)
         }

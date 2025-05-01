@@ -1,45 +1,45 @@
 ## ----eval=FALSE---------------------------------------------------------------
-#  library(GDINA)
-#  dat <- sim10GDINA$simdat
-#  Q <- matrix(c(1,0,0,
-#                0,1,0,
-#                0,0,1,
-#                1,0,1,
-#                0,1,1,
-#                1,1,0,
-#                0,0,1,
-#                1,0,0,
-#                1,1,1,
-#                1,0,1),byrow = T,ncol = 3)
+# library(GDINA)
+# dat <- sim10GDINA$simdat
+# Q <- matrix(c(1,0,0,
+#               0,1,0,
+#               0,0,1,
+#               1,0,1,
+#               0,1,1,
+#               1,1,0,
+#               0,0,1,
+#               1,0,0,
+#               1,1,1,
+#               1,0,1),byrow = T,ncol = 3)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  est <- GDINA(dat = dat, Q = Q, model = "GDINA")
+# est <- GDINA(dat = dat, Q = Q, model = "GDINA")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  Qv <- Qval(est)
-#  Qv
+# Qv <- Qval(est)
+# Qv
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  Qv2 <- Qval(est,method = "Wald")
-#  Qv2
+# Qv2 <- Qval(est,method = "Wald")
+# Qv2
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  plot(Qv, item = 9)
+# plot(Qv, item = 9)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  mc <- modelcomp(est)
-#  mc
+# mc <- modelcomp(est)
+# mc
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  # test level absolute fit
-#  mft <- modelfit(est)
-#  mft
-#  # item level absolute fit
-#  ift <- itemfit(est)
-#  ift
-#  summary(ift)
-#  plot(ift)
+# # test level absolute fit
+# mft <- modelfit(est)
+# mft
+# # item level absolute fit
+# ift <- itemfit(est)
+# ift
+# summary(ift)
+# plot(ift)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  CA(est)
+# CA(est)
 
