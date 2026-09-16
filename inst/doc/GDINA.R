@@ -39,6 +39,9 @@
 # ift
 # summary(ift)
 # plot(ift)
+# 
+# pdft<- itemfitPD(est)
+# pdft
 
 ## ----eval=FALSE---------------------------------------------------------------
 # CA(est)

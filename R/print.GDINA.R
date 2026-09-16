@@ -3,8 +3,8 @@
 print.GDINA <-
   function(x, ...)
   {
-    cat("Call:\n", paste(deparse(extract.GDINA(x,"call")), sep = "\n", collapse = "\n"),
-        "\n\n", sep = "")
+    #cat("Call:\n", paste(deparse(extract.GDINA(x,"call")), sep = "\n", collapse = "\n"),
+    #    "\n\n", sep = "")
     packageinfo <- utils::packageDescription("GDINA")
     cat( paste( "GDINA version " , packageinfo$Version , " (" , packageinfo$Date , ")" , sep="") , "\n" )
     cat("===============================================\n")
@@ -54,12 +54,45 @@ print.simGDINA <-
 print.CA <-
   function(x, ...)
   {
-    cat("Classification Accuracy \n")
-    cat("\nTest level accuracy = ", round(x$tau,4), "\n")
-    cat("\nPattern level accuracy: \n\n")
-    print(round(x$tau_l,4))
-    cat("\nAttribute level accuracy: \n\n")
-    print(round(x$tau_k,4))
+    cat("Classification Reliability (Accuracy and Consistency)\n")
+    cat("=================================================\n\n")
+
+    test.summary <- data.frame(
+      Measure = c("Accuracy", "Consistency"),
+      Estimate = round(c(x$tau, x$gamma), 4),
+      row.names = NULL
+    )
+    cat("Overall pattern-level accuracy (tau) = ", round(x$tau,4),"\n")
+    cat("Overall pattern-level consistency (gamma) = ", round(x$gamma,4),"\n")
+    cat("-----------------------------------------------\n")
+    if(length(x$tau_l)<=2^6){
+      pattern.summary <- data.frame(
+        Pattern = names(x$tau_l),
+        Accuracy = round(x$tau_l, 4),
+        "Class size" = round(as.vector(extract(x$GDINA.obj,"posterior.prob")),4),
+        row.names = NULL
+      )
+      print(pattern.summary, row.names = FALSE)
+    }
+
+
+    attribute.ac <- data.frame(
+      Attribute = names(x$tau_k),
+      Prevelence = round(as.vector(extract(x$GDINA.obj,"prevalence")$all[,2]),4),
+      tau_k = round(x$tau_k, 4),
+      gamma_k = round(x$gamma_k, 4),row.names = NULL
+      )
+
+    colnames(attribute.ac) <- c("Attribute", "Prevelence", "Accuracy (tau_k)",
+                                "Consistency (gamma_k)")
+
+    cat("\nAttribute level:\n")
+    cat("-----------------------------------------------\n")
+    print(attribute.ac, row.names = FALSE)
+
+
+
+    invisible(x)
   }
 #' @export
 print.modelcomp <- function(x, ...)
@@ -110,7 +143,7 @@ print.itemfit <-
                                         max(logOR$zstat[is.finite(logOR$zstat)],na.rm = TRUE),
                                         logOR$unadj.pvalue[which(logOR$zstat==max(logOR$zstat[is.finite(logOR$zstat)],na.rm = TRUE))],
                                         logOR$test.adj.pvalue[which(logOR$zstat==max(logOR$zstat[is.finite(logOR$zstat)],na.rm = TRUE))]))
-    colnames(testlevel.itemfit) <- c("Proportion correct","Transformed correlation","Log odds ratio")
+    colnames(testlevel.itemfit) <- c("Item mean score","Transformed correlation","Log odds ratio")
     rownames(testlevel.itemfit) <- c("mean[stats]","max[stats]",
                                      "max[z.stats]","p-value","adj.p-value")
     print(t(round(testlevel.itemfit,extract.itemfit(x,"digits"))))
@@ -152,6 +185,24 @@ print.dif <-
     cat("\nDifferential Item Functioning Detection\n")
     print(round(x$test,4))
 cat("\nNote: adjusted pvalues are based on the",x$p.adjust.methods,"correction.\n")
+  }
+
+#' @export
+print.pairwiseDIF <-
+  function(x, ...)
+  {
+    cat("\nPairwise Post Hoc DIF Analysis\n")
+    if (nrow(x$test) == 0L) {
+      cat("\nNo items were flagged for pairwise DIF follow-up.\n")
+    } else {
+      out <- x$test
+      numeric.col <- vapply(out, is.numeric, logical(1))
+      out[numeric.col] <- lapply(out[numeric.col], round, 4)
+      print(out)
+    }
+    cat("\nNote: adjusted pvalues are based on the", x$p.adjust.methods,
+        "correction within each item.\n")
+    invisible(x)
   }
 
 #' @export
@@ -331,8 +382,12 @@ print.itemfitPD <- function(x,...){
   cat("\np-value adjustment method =", x$options$p.adjust.method)
 
   cat("\n-------------------------------------")
-  cat("\nAt .05 nominal level, items flagged according to...", "\n")
-  cat("  X2 = ", paste0(which(x$X2$adjp < 0.05), collapse = ", "), "\n")
-  cat("  G2 = ", paste0(which(x$G2$adjp < 0.05), collapse = ", "), "\n")
-  cat("  PD = ", paste0(which(x$PD$adjp < 0.05), collapse = ", "), "\n")
+  if(any(x$X2$adjp < 0.05, na.rm = TRUE) | any(x$G2$adjp < 0.05, na.rm = TRUE) | any(x$PD$adjp < 0.05, na.rm = TRUE)){
+    cat("\nItems flagged for misfit (at .05 nominal level):\n")
+  cat("  Based on X2: ", paste0(which(x$X2$adjp < 0.05), collapse = ", "), "\n")
+  cat("  Based on G2: ", paste0(which(x$G2$adjp < 0.05), collapse = ", "), "\n")
+  cat("  Based on PD: ", paste0(which(x$PD$adjp < 0.05), collapse = ", "), "\n")
+  }else{
+    cat("\nNo items flagged for misfit (at .05 nominal level).\n")
+  }
 }

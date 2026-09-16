@@ -118,6 +118,96 @@ plot.GDINA <-
 
   }
 
+#' Grouped bar plots for pairwise DIF posthoc analysis
+#'
+#' Create grouped bar charts of group-specific item/category response probabilities
+#' for DIF items identified by \code{pairwiseDIF()}.
+#'
+#' @param x model object of class \code{\link{pairwiseDIF}}
+#' @param item A scalar or vector specifying the DIF item(s) to plot.
+#' @param withSE logical; Add error bar (estimate - SE, estimate + SE) to the plots?
+#' @param SE.type How is SE estimated. By default, it's based on OPG using incomplete information.
+#' @param ... additional arguments
+#' @seealso \code{\link{pairwiseDIF}}, \code{\link{dif}}
+#' @export
+plot.pairwiseDIF <- function(x, item = "all", withSE = FALSE, SE.type = 2, ...){
+  lc <- p <- upper <- lower <- group <- NULL
+
+  stopifnot(inherits(x, "pairwiseDIF"))
+
+  if(length(x$dif.items) == 0L || is.null(x$posthoc.fit))
+    stop("No DIF items are available for plotting.", call. = FALSE)
+
+  if(is.null(x$posthoc.config) || is.null(x$item.names))
+    stop("The supplied pairwiseDIF object does not contain the stored plotting metadata. Refit pairwiseDIF() with the current version first.", call. = FALSE)
+
+  if(length(item) == 1L && is.character(item) && tolower(item) == "all")
+    item <- x$dif.items
+
+  if(any(!is.numeric(item)) || any(!item %in% x$dif.items))
+    stop("item must be 'all' or a numeric vector of DIF items in the pairwiseDIF object.", call. = FALSE)
+
+  item <- unique(as.integer(item))
+
+  if(isTRUE(x$sequential)){
+    tit <- "Group-specific processing functions"
+    ylab <- "Probability"
+  }else{
+    tit <- "Group-specific item success probabilities"
+    ylab <- "Probability of success"
+  }
+
+  ip <- extract(x$posthoc.fit, what = "catprob.parm")
+  if(withSE)
+    se <- extract(x$posthoc.fit, what = "catprob.se", SE.type = SE.type)
+
+  for (j in item){
+    item.loc <- which(x$posthoc.config$item == j & x$posthoc.config$group > 0L)
+    item.loc <- item.loc[order(x$posthoc.config$group[item.loc])]
+    plot.dat <- vector("list", length(item.loc))
+
+    for(k in seq_along(item.loc)){
+      loc <- item.loc[k]
+      tmp.obj <- ip[[loc]]
+      tmp.name <- gsub("P\\(", "", names(tmp.obj))
+      tmp.name <- gsub("\\)", "", tmp.name)
+      tmp.group <- as.character(x$group.labels[x$posthoc.config$group[loc]])
+
+      if(withSE){
+        lower <- tmp.obj - se[[loc]]
+        lower[lower < 0] <- 0
+        upper <- tmp.obj + se[[loc]]
+        upper[upper > 1] <- 1
+        plot.dat[[k]] <- data.frame(lc = tmp.name, p = tmp.obj, lower = lower,
+                                    upper = upper, group = tmp.group)
+      }else{
+        plot.dat[[k]] <- data.frame(lc = tmp.name, p = tmp.obj, group = tmp.group)
+      }
+    }
+
+    plot.dat <- do.call(rbind, plot.dat)
+    plot.dat$lc <- factor(plot.dat$lc, levels = unique(plot.dat$lc))
+    plot.dat$group <- factor(plot.dat$group, levels = as.character(x$group.labels))
+
+    g <- ggplot2::ggplot(data = plot.dat, ggplot2::aes(x = lc, y = p, fill = group)) +
+      ggplot2::geom_bar(stat = "identity", position = "dodge") +
+      ggplot2::ylim(0, 1) +
+      ggplot2::labs(x = "Latent group", y = ylab,
+                    fill = "Group",
+                    title = paste(tit, "for", x$item.names[j]))
+
+    if(withSE){
+      g <- g + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper),
+                                      position = ggplot2::position_dodge(width = 0.9),
+                                      width = 0.15)
+    }
+
+    print(g)
+  }
+
+  invisible(x)
+}
+
 
 #' Item fit plots
 #'
@@ -249,66 +339,113 @@ plot.Qval <-
            data.label = TRUE,eps = "auto",
            original.q.label = FALSE,auto.ylim = TRUE,...)
   {
-    if(eps=="auto") eps <- round(x$eps, 2)
-    if(x$sequential){
-      Q <- extract.Qval(x,"Q")[,-c(1:2)]
-    }else{
-      Q <- extract.Qval(x,"Q")
+    type <- match.arg(tolower(type), c("best", "all"))
+    if (identical(eps, "auto")) eps <- round(x$eps, 2)
+    if (x$sequential) {
+      Q <- extract.Qval(x, "Q")[, -c(1:2), drop = FALSE]
+    } else {
+      Q <- extract.Qval(x, "Q")
     }
 
     K <- ncol(Q)
-    L <- (2^K-1) # L-1
+    L <- 2^K - 1
     patt <- attributepattern(K)
-    fullPVAF <- extract.Qval(x,"PVAF")
-    if(tolower(type)=="all"){
-
-      if (L<no.qvector) no.qvector <- L
-      for (y in item){
-        #which one is the true
-        locy0 <- which(apply(patt[-1,],1,function(x){all(x==Q[y,])}))
-
-        locy <- no.qvector-(L-which(order(fullPVAF[,y],decreasing = F)==locy0))
-        ordered.PVAF.j <- sort(fullPVAF[,y],decreasing = FALSE)
-        graphics::plot(ordered.PVAF.j[(L-no.qvector+1):L],xaxt="n",type="o",ylab = "PVAF",xlab="q-vector",
-                       main = paste("Mesa Plot for Item",y),ylim = c(0,1),...)
-        axis(1,at=c(1:no.qvector),labels = names(ordered.PVAF.j[(L-no.qvector+1):L]))
-        if (locy>0){
-          points(locy,fullPVAF[locy0,y],col="red",pch=19)
-        }
-        if (!is.null(eps)&&eps>0&&eps<1) abline(h=eps,lty=3);text(1.5,eps+0.03,paste("eps =",eps))
-        if (original.q.label) text(no.qvector-1,0.15,paste("original q-vector:\n",names(fullPVAF[,y])[locy0]))
-        if (auto.ylim) ylim = c(max(0,round(min(ordered.PVAF.j)-0.1,1)),1) else ylim=c(0,1)
-        yloc <- ordered.PVAF.j[(L-no.qvector+1):L]-diff(ylim)/15
-        yloc[yloc<=ylim[1]] <- yloc[yloc<=ylim[1]] + 2 * diff(ylim)/15
-        if (data.label) text(c(1:no.qvector),
-                             yloc,
-                             ordered.PVAF.j[(L-no.qvector+1):L])
-
-      }
-    }else if(tolower(type)=="best"){
-      fullPVAF <- rbind(0,fullPVAF)
-      Kj <- rowSums(patt)
-      bestPVAF <- aggregate(fullPVAF,by=list(Kj),max)[,-1]
-      # bestPVAF <- rbind(0,bestPVAF) # add 0s
-      label.bestPVAF <- apply(patt,1,paste0,collapse = "")
-      bestloc <- rbind(1,aggregate(fullPVAF,by=list(Kj),which.max)[-1,-1]+cumsum(table(Kj))[-length(unique(Kj))])
-      for(j in item){
-        bestlocj <- bestloc[,j]
-        if (auto.ylim) ylim = c(max(0,round(min(bestPVAF[,j])-0.1,1)),1) else ylim=c(0,1)
-        graphics::plot(bestPVAF[,j],xaxt="n",type="o",ylab = "PVAF",xlab="q-vector",
-                       main = paste("Mesa Plot for Item",j),ylim = ylim,...)
-        graphics::axis(1,at=c(1:nrow(bestPVAF)),labels = label.bestPVAF[bestlocj])
-        if (!is.null(eps)&&eps>0&&eps<1) abline(h=eps,lty=3);text(1.5,eps+0.03,paste("eps =",eps))
-        yloc <- bestPVAF[,j]-diff(ylim)/15
-        yloc[yloc<=ylim[1]] <- yloc[yloc<=ylim[1]] + 2 * diff(ylim)/15
-        if (data.label) graphics::text(c(1:nrow(bestPVAF)),yloc,bestPVAF[,j])
-        locy0 <- which(apply(patt,1,function(x){
-          all(x==Q[j,])}))
-        if(locy0%in%bestlocj) graphics::points(which(bestlocj==locy0),fullPVAF[locy0,j],col="red",pch=19)
-        if (original.q.label) text(K-1,ylim[1]+diff(ylim)/6,paste("original q-vector:\n",names(fullPVAF[,j])[locy0]))
-      }
+    fullPVAF <- extract.Qval(x, "PVAF")
+    q.labels <- rownames(fullPVAF)
+    if (is.null(q.labels)) {
+      q.labels <- apply(patt[-1, , drop = FALSE], 1, paste0, collapse = "")
     }
+    best.q.labels <- c(
+      paste0(patt[1, ], collapse = ""),
+      q.labels
+    )
 
+    for (j in item) {
+      original.loc <- which(apply(patt[-1, , drop = FALSE], 1,
+                                  function(pattern) all(pattern == Q[j, ])))
+
+      if (type == "all") {
+        n.plot <- min(no.qvector, L)
+        locations <- order(fullPVAF[, j], decreasing = FALSE)
+        locations <- locations[(L - n.plot + 1):L]
+        plot.dat <- data.frame(
+          rank = seq_len(n.plot),
+          q.vector = factor(q.labels[locations], levels = q.labels[locations]),
+          PVAF = fullPVAF[locations, j],
+          original = locations == original.loc
+        )
+      } else {
+        pvaf.with.zero <- c(0, fullPVAF[, j])
+        n.attributes <- rowSums(patt)
+        locations.by.size <- split(seq_along(pvaf.with.zero), n.attributes)
+        best.locations <- vapply(
+          locations.by.size,
+          function(locations) locations[which.max(pvaf.with.zero[locations])],
+          integer(1)
+        )
+        best.values <- pvaf.with.zero[best.locations]
+        plot.dat <- data.frame(
+          rank = seq_along(best.values),
+          q.vector = factor(best.q.labels[best.locations],
+                            levels = best.q.labels[best.locations]),
+          PVAF = best.values,
+          original = best.locations == original.loc + 1L
+        )
+      }
+
+      if (auto.ylim) {
+        lower <- max(0, round(min(plot.dat$PVAF) - 0.1, 1))
+      } else {
+        lower <- 0
+      }
+
+      g <- ggplot2::ggplot(plot.dat, ggplot2::aes(x = ggplot2::.data$rank, y = ggplot2::.data$PVAF)) +
+        ggplot2::geom_line(color = "#3B536D", linewidth = 0.7) +
+        ggplot2::geom_point(color = "#3B536D", size = 2.4) +
+        ggplot2::scale_x_continuous(breaks = plot.dat$rank,
+                                    labels = plot.dat$q.vector) +
+        ggplot2::scale_y_continuous(limits = c(lower, 1),
+                                    expand = ggplot2::expansion(mult = c(0.02, 0.05))) +
+        ggplot2::labs(
+          x = "Candidate q-vector",
+          y = "PVAF",
+          title = paste("Mesa plot for item", j),
+          subtitle = if (type == "best") "Best candidate by number of attributes" else
+            paste("Top", n.plot, "candidate q-vectors")
+        ) +
+        ggplot2::theme_bw(base_size = 11) +
+        ggplot2::theme(
+          panel.grid.minor = ggplot2::element_blank(),
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          plot.title = ggplot2::element_text(face = "bold"),
+          plot.subtitle = ggplot2::element_text(color = "#687078")
+        )
+
+      if (any(plot.dat$original)) {
+        g <- g + ggplot2::geom_point(
+          data = plot.dat[plot.dat$original, , drop = FALSE],
+          color = "#C44E52", size = 3.2
+        )
+      }
+      if (data.label) {
+        g <- g + ggplot2::geom_text(ggplot2::aes(label = round(ggplot2::.data$PVAF, 3)),
+                                    vjust = -0.8, size = 3, color = "#3B536D")
+      }
+      if (!is.null(eps) && eps > 0 && eps < 1) {
+        g <- g + ggplot2::geom_hline(yintercept = eps, linetype = "dashed",
+                                     color = "#C44E52") +
+          ggplot2::annotate("text", x = 1, y = eps, label = paste("eps =", eps),
+                            hjust = 0, vjust = -0.5, color = "#C44E52", size = 3)
+      }
+      if (original.q.label) {
+        g <- g + ggplot2::labs(caption = paste(
+          "Original q-vector:", q.labels[original.loc],
+          "| PVAF:", round(fullPVAF[original.loc, j], 3)
+        ))
+      }
+      print(g)
+    }
+    invisible(x)
   }
 
 

@@ -19,12 +19,12 @@
 #' @param seed random seed.
 #' @return an object of class \code{itemfitPD} consisting of several elements including:
 #' \describe{
-#' \item{p}{the proportion correct statistics, adjusted and unadjusted p values for each item}
-#' \item{r}{the transformed correlations, adjusted and unadjusted p values for each item pair}
-#' \item{logOR}{the log odds ratios, adjusted and unadjusted p values for each item pair}
-#' \item{maxitemfit}{the maximum proportion correct, transformed correlation, and log-odds ratio for each item with associated item-level adjusted p-values}
+#' \item{X2}{Chi square statistics, adjusted and unadjusted p values for each item}
+#' \item{G2}{G square statistics, adjusted and unadjusted p values for each item}
+#' \item{PD}{PD statistics, adjusted and unadjusted p values for each item}
+#' \item{time}{time used for the computation}
 #' }
-#'#' @importFrom foreach %dopar% foreach
+#' @importFrom foreach %dopar% foreach
 #' @author Pablo Najera
 #'   Universidad Pontificia Comillas
 #'   \email{pnajera@comillas.edu}
@@ -34,7 +34,7 @@
 #'   \email{wma@umn.edu}
 #' @export
 #' @references
-#' Najera, P., Ma, W., Sorrel, M. A. and Abad, F. J. (Under review). Assessing Item-Level Fit for the Sequential G-DINA Model.
+#' Najera, P., Ma, W., Sorrel, M. A. and Abad, F. J. (2025). Assessing Item-Level Fit for the Sequential G-DINA Model.\emph{Behaviormetrika}.
 #'
 #' @examples
 #' \dontrun{
